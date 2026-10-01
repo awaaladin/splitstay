@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Terms · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <article class="mx-auto max-w-3xl legal">
+    <p class="eyebrow">Legal</p>
+    <h1 class="page-title mt-1 !text-[2.25rem] !leading-[2.5rem]">Terms of use</h1>
+    <p class="meta mt-2">Last updated 1 October 2026</p>
+    <p class="mt-6 text-lead text-muted">By creating an account or using SplitStay you agree to these terms. They are short on purpose. Please read them, especially the parts about payments.</p>
+
+    <h2>1. What SplitStay is</h2>
+    <p>SplitStay lets groups of people pool money toward a shared cost and have the pooled money paid to a bill or a bank account once a target is met. It is a contribution tool. <b>It is not a loan, a savings account or an investment</b>, and it never pays anything on your behalf in advance.</p>
+
+    <h2>2. Your account</h2>
+    <p>You must be at least 18 and provide accurate details. Keep your password safe: you are responsible for activity on your account. Tell us promptly if you think someone else has accessed it.</p>
+
+    <h2>3. Groups and admins</h2>
+    <ul>
+      <li>The person who creates a group is its <b>admin</b>. The admin chooses the target, due date, members, shares and the destination (a bank account or a meter number), and is responsible for entering them correctly.</li>
+      <li>Members pay only their own share. Once the first payment is received, members, shares, the target and the payout type are locked.</li>
+      <li>The admin must only add people who agree to be in the group, and must only use a destination they are entitled to pay.</li>
+    </ul>
+
+    <h2>4. Payments and payouts</h2>
+    <ul>
+      <li>Payments are collected by our payment company. Their terms and charges apply at checkout.</li>
+      <li>When a group reaches its target (or the admin pays out early, where the group allows it), we pay the destination recorded for the group. Because the destination is set by the group's admin, <b>please check it carefully before anyone pays</b>. We cannot recover money sent to a wrong but valid account or meter.</li>
+      <li>If a payout fails, the pooled money is kept and the admin may retry. A payout is not made twice for the same group.</li>
+      <li>Electricity tokens are issued by the electricity company's provider. We pass on what they return and are not responsible for the supply of electricity.</li>
+    </ul>
+
+    <h2>5. Fees</h2>
+    <p>Our service fee is described on the <a href="{% url 'web:pricing' %}">Fees</a> page. It is deducted from the pooled amount at payout and recorded as its own entry. The fee can change; the fee that applies to a payout is the one recorded on that payout.</p>
+
+    <h2>6. No refunds in this version</h2>
+    <p>SplitStay does not currently offer refunds of contributions. A group that has received money cannot be cancelled; it can only be paid out. Where a payment arrives in an unusual state (for example, after a group has closed) we flag it for review and will contact the people involved.</p>
+
+    <h2>7. Acceptable use</h2>
+    <p>Do not use SplitStay for anything unlawful, to defraud or mislead others, to launder money, or to interfere with the service. We may suspend accounts or groups that do.</p>
+
+    <h2>8. Our responsibility</h2>
+    <p>We work hard to keep the service accurate and available, but we cannot promise it will always be uninterrupted or error-free. To the extent the law allows, we are not liable for indirect or consequential loss, or for losses caused by incorrect details entered by users, or by banks, payment companies or electricity companies. Nothing here limits liability that cannot lawfully be limited.</p>
+
+    <h2>9. Changes and law</h2>
+    <p>We may update these terms and will tell you in the app when we do. These terms are governed by the laws of the Federal Republic of Nigeria.</p>
+
+    <h2>10. Contact</h2>
+    <p>Questions about these terms? Use the <a href="{% url 'web:contact' %}">contact form</a>.</p>
+  </article>
+</div>
+{% endblock %}

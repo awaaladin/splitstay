@@ -1,36 +1,359 @@
 {% extends "base.html" %}
-{% load cp %}
+{% load static cp %}
+{% block title %}SplitStay · Nobody chases anybody for money{% endblock %}
+{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}.stage-layer{position:static;opacity:1;transform:none;filter:none;margin-bottom:1rem}</style></noscript>{% endblock %}
+{% block main_class %}{% endblock %}
+
 {% block content %}
-<div class="page">
-  <section class="grid gap-12 py-8 lg:grid-cols-5 lg:py-16">
-    <div class="lg:col-span-3">
-      <p class="eyebrow">Group contributions, done properly</p>
-      <h1 class="mt-4 text-display text-fg">Shared costs, settled in the open.</h1>
-      <p class="mt-5 max-w-xl text-lead text-muted">Roommates, families and friends pool money toward rent, light bills, subscriptions or family upkeep. When the target is met, SplitStay pays the bill or the recipient directly, and everyone can see exactly who paid and what was paid out.</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="{% url 'web:register' %}" class="btn-primary">Start a group {% icon "arrow-right" 18 %}</a>
-        <a href="{% url 'web:login' %}" class="btn-secondary">Sign in</a>
+
+{# ───────────────────────────── 1. HERO ───────────────────────────── #}
+<section id="hero" class="force-dark relative overflow-hidden border-b border-line">
+  <div class="hero-bg"></div>
+  <div class="page relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-12 lg:py-28">
+
+    <div class="lg:col-span-6">
+      <p class="reveal eyebrow flex items-center gap-2"><span class="pulse-dot h-1.5 w-1.5 rounded-full bg-primary text-primary"></span> Rent · Light bill · Family upkeep</p>
+      <h1 class="words mt-5 text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.035em] text-fg sm:text-[4rem]" data-split>Nobody chases anybody for money.</h1>
+      <p class="reveal mt-6 max-w-lg text-lead text-muted" style="--d:450ms">
+        SplitStay collects everyone's share, watches the pot fill, then pays the landlord or the electricity company itself. Every naira stays visible to everyone in the group.
+      </p>
+      <div class="reveal mt-9 flex flex-wrap items-center gap-3" style="--d:600ms">
+        {% if user.is_authenticated %}
+        <a href="{% url 'web:group_new' %}" class="btn-primary magnetic !px-6 !py-3" data-magnetic>Start a group {% icon "arrow-right" 18 %}</a>
+        <a href="{% url 'web:guide' %}" class="btn-secondary !px-5 !py-3">Read the guide</a>
+        {% else %}
+        <a href="{% url 'web:register' %}" class="btn-primary magnetic !px-6 !py-3" data-magnetic>Start a group {% icon "arrow-right" 18 %}</a>
+        <a href="{% url 'web:guide' %}" class="btn-secondary !px-5 !py-3">How to use it</a>
+        {% endif %}
       </div>
-      <p class="mt-6 flex items-center gap-2 text-meta text-muted">{% icon "shield-check" 16 %} Not a loan. SplitStay never pays anything on your behalf in advance.</p>
+      <ul class="reveal mt-10 flex flex-wrap gap-x-6 gap-y-2 text-meta text-muted" style="--d:750ms">
+        <li class="flex items-center gap-2">{% icon "shield-check" 16 %} Not a loan, ever</li>
+        <li class="flex items-center gap-2">{% icon "receipt" 16 %} Fees shown as their own line</li>
+        <li class="flex items-center gap-2">{% icon "lock" 16 %} Bank details encrypted</li>
+      </ul>
     </div>
 
-    <div class="lg:col-span-2">
-      <div class="card card-pad">
-        <p class="eyebrow">How the money moves</p>
-        <ol class="mt-5 space-y-6">
-          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "users" 18 %}</span><div><p class="text-body font-medium">Everyone pays their own share</p><p class="meta mt-0.5">Equal by default, or set exact amounts for uneven splits.</p></div></li>
-          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "wallet" 18 %}</span><div><p class="text-body font-medium">The group fills toward its target</p><p class="meta mt-0.5">Watch it fill live. Nothing is paid out early unless the admin allows it.</p></div></li>
-          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "zap" 18 %}</span><div><p class="text-body font-medium">The bill or landlord is paid directly</p><p class="meta mt-0.5">Electricity tokens are bought for your meter; rent goes to the recipient's bank account.</p></div></li>
-          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "receipt" 18 %}</span><div><p class="text-body font-medium">Everything lands in the ledger</p><p class="meta mt-0.5">Contributions, the service fee and the payout, visible to every member.</p></div></li>
-        </ol>
+    {# Live demo: the real components, running on a loop #}
+    <div class="reveal relative lg:col-span-6" style="--d:300ms">
+      <div class="relative mx-auto max-w-[34rem]">
+        <div class="absolute -inset-6 -z-10 rounded-[2rem] bg-primary/10 blur-3xl"></div>
+        <div class="rounded-2xl border border-line-strong bg-surface shadow-raised">
+          <div class="flex items-center justify-between border-b border-line px-5 py-3.5">
+            <div class="flex items-center gap-2.5"><span class="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "building" 18 %}</span>
+              <div><p class="text-body font-semibold leading-tight">Flat 4B Rent</p><p class="text-micro normal-case tracking-normal text-muted">Monthly · due 8 Oct</p></div></div>
+            <span class="badge-neutral" id="h-badge"><span class="dot"></span><span id="h-badge-text">Open</span></span>
+          </div>
+
+          <div class="flex items-center gap-4 px-4 pt-5 sm:gap-6 sm:px-5">
+            <div class="pot !w-[88px] sm:!w-[104px]">
+              <div class="pot-vessel !h-[164px]">
+                <div class="pot-liquid" id="h-liquid" style="transform:translateY(100%)">
+                  <svg class="pot-wave b" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q25 2 50 10 T100 10 T150 10 T200 10 V20 H0Z"/></svg>
+                  <svg class="pot-wave a" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 V20 H0Z"/></svg>
+                  <div class="pot-body"></div>
+                </div>
+                <div class="pot-sheen"></div>
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="eyebrow">Funded so far</p>
+              <p class="amount text-[1.5rem] leading-8 text-fg sm:text-[2rem] sm:leading-9" id="h-funded">₦0.00</p>
+              <p class="meta mt-0.5">of <span class="tnum font-medium text-fg">₦600,000.00</span> · <span id="h-pct" class="tnum">0%</span></p>
+              <p class="mt-3 text-meta text-muted" id="h-status">Waiting for the first payment…</p>
+            </div>
+          </div>
+
+          <ul class="mt-5 divide-line border-t border-line" id="h-members">
+            <li class="flex items-center gap-3 px-5 py-2.5" data-i="0"><span class="grid h-7 w-7 place-items-center rounded-full bg-primary-soft text-micro tracking-normal text-primary">AO</span><span class="flex-1 text-body">Ada Okafor <span class="text-muted tnum">· ₦133,333.34</span></span><span class="badge-neutral h-state"><span class="dot"></span>Not yet paid</span></li>
+            <li class="flex items-center gap-3 px-5 py-2.5" data-i="1"><span class="grid h-7 w-7 place-items-center rounded-full bg-primary-soft text-micro tracking-normal text-primary">TB</span><span class="flex-1 text-body">Tunde Bello <span class="text-muted tnum">· ₦200,000.00</span></span><span class="badge-neutral h-state"><span class="dot"></span>Not yet paid</span></li>
+            <li class="flex items-center gap-3 px-5 py-2.5" data-i="2"><span class="grid h-7 w-7 place-items-center rounded-full bg-primary-soft text-micro tracking-normal text-primary">CE</span><span class="flex-1 text-body">Chioma Eze <span class="text-muted tnum">· ₦133,333.33</span></span><span class="badge-neutral h-state"><span class="dot"></span>Not yet paid</span></li>
+            <li class="flex items-center gap-3 px-5 py-2.5" data-i="3"><span class="grid h-7 w-7 place-items-center rounded-full bg-primary-soft text-micro tracking-normal text-primary">IM</span><span class="flex-1 text-body">Ibrahim Musa <span class="text-muted tnum">· ₦133,333.33</span></span><span class="badge-neutral h-state"><span class="dot"></span>Not yet paid</span></li>
+          </ul>
+          <div class="h-[3.25rem] overflow-hidden border-t border-line px-5 py-2.5"><ul id="h-ledger" class="text-meta"></ul></div>
+        </div>
+
+        {# Floating outcome cards #}
+        <div id="h-sent" class="toast-pop absolute -bottom-5 -left-3 w-64 rounded-xl border border-line-strong bg-surface p-3.5 shadow-raised sm:-left-10">
+          <p class="flex items-center gap-2 text-meta font-medium text-ok">{% icon "check" 16 %} Transfer sent</p>
+          <p class="mt-1 text-body font-semibold">Adewale Properties Ltd</p>
+          <p class="amount text-meta text-muted">₦599,850.00 after ₦150.00 fee</p>
+        </div>
+        <div id="h-token" class="toast-pop absolute -right-2 top-10 hidden w-52 rounded-xl border border-line-strong bg-surface p-3.5 shadow-raised sm:block lg:-right-8">
+          <p class="eyebrow">Pot reached target</p>
+          <p class="mt-1 text-meta text-muted">Payout started automatically. No one had to click.</p>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="grid gap-6 border-t border-line py-12 sm:grid-cols-3">
-    <div><h2 class="section-title">Open to every member</h2><p class="mt-2 text-body text-muted">The way an ajo circle works: everyone can see who has paid and who hasn't. The ledger is not an admin-only view.</p></div>
-    <div><h2 class="section-title">One explicit fee</h2><p class="mt-2 text-body text-muted">A flat or percentage service fee is taken at payout and recorded as its own line, never as a silent deduction.</p></div>
-    <div><h2 class="section-title">Recurring, without the admin work</h2><p class="mt-2 text-body text-muted">A monthly light-bill group reopens on the same day with the same members and split.</p></div>
-  </section>
+{# ───────────────────────────── 2. MARQUEE ───────────────────────────── #}
+<section class="border-b border-line py-7" aria-label="What you can pay">
+  <div class="fade-x overflow-hidden">
+    <div class="marquee">
+      {% for _ in "ab" %}
+      <ul class="flex flex-none items-center gap-10 pr-10 text-section font-medium text-muted">
+        <li>Rent</li><li class="text-line-strong">/</li><li>Ikeja Electric</li><li class="text-line-strong">/</li><li>Family upkeep</li><li class="text-line-strong">/</li><li>Eko Electric</li><li class="text-line-strong">/</li><li>Subscriptions</li><li class="text-line-strong">/</li><li>Abuja Electric</li><li class="text-line-strong">/</li><li>School fees</li><li class="text-line-strong">/</li><li>Ibadan Electric</li><li class="text-line-strong">/</li><li>Landlord transfers</li><li class="text-line-strong">/</li><li>Enugu Electric</li><li class="text-line-strong">/</li><li>Anything custom</li><li class="text-line-strong">/</li>
+      </ul>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ───────────────────────────── 3. STORY ───────────────────────────── #}
+<section id="story" class="py-24 sm:py-32">
+  <div class="page">
+    <div class="max-w-2xl">
+      <p class="reveal eyebrow">A month, three ways it usually goes wrong</p>
+      <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg sm:text-5xl" style="--d:100ms">The money was never the hard part. The chasing was.</h2>
+    </div>
+
+    <div class="mt-16 grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="relative pl-7 lg:col-span-5" id="chapters">
+        <div class="rail"><i id="rail"></i></div>
+
+        <article class="chapter active lg:flex lg:min-h-[78vh] lg:flex-col lg:justify-center" data-chapter="0">
+          <p class="eyebrow">01 · The rent</p>
+          <h3 class="mt-3 text-title text-fg">One landlord. Four people. One clean transfer.</h3>
+          <p class="mt-4 text-lead text-muted">Everyone pays their own share into the pot, equal or not. When it's full, the landlord gets a single transfer to the account on file, with a receipt to match. No screenshots of bank alerts in the group chat.</p>
+          <div class="duotone kenburns relative mt-6 h-64 overflow-hidden rounded-xl lg:hidden"><img src="{% static 'img/story/rent.jpg' %}" alt="A new apartment tower rising behind older single-storey houses in Lagos" loading="lazy" width="900" height="1195"></div>
+        </article>
+
+        <article class="chapter lg:flex lg:min-h-[78vh] lg:flex-col lg:justify-center" data-chapter="1">
+          <p class="eyebrow">02 · The light</p>
+          <h3 class="mt-3 text-title text-fg">The meter doesn't wait for whoever "will sort it".</h3>
+          <p class="mt-4 text-lead text-muted">Put in the meter number once. When the pool reaches the target, SplitStay buys the units from your disco and the token lands in everyone's ledger. Whoever is home gets light; nobody is out of pocket.</p>
+          <div class="duotone kenburns relative mt-6 h-64 overflow-hidden rounded-xl lg:hidden"><img src="{% static 'img/story/light.jpg' %}" alt="A lineman working on an electricity pole beside a busy Nigerian road" loading="lazy" width="900" height="1600"></div>
+        </article>
+
+        <article class="chapter lg:flex lg:min-h-[78vh] lg:flex-col lg:justify-center" data-chapter="2">
+          <p class="eyebrow">03 · The upkeep</p>
+          <h3 class="mt-3 text-title text-fg">Uneven shares, the same day every month.</h3>
+          <p class="mt-4 text-lead text-muted">Families split by what each person can carry, not by headcount. Set the amounts once. When a cycle is paid out, the next one opens itself with the same people and the same split, and the right ones get a nudge as the day nears.</p>
+        </article>
+      </div>
+
+      {# Sticky stage: layers cross-fade as chapters scroll by #}
+      <div class="hidden lg:col-span-7 lg:block">
+        <div class="stage sticky top-24 h-[36rem]" id="stage" data-active="0">
+
+          <div class="stage-layer layer-0 overflow-hidden rounded-2xl">
+            <div class="duotone kenburns absolute inset-0"><img src="{% static 'img/story/rent.jpg' %}" alt="A new apartment tower rising behind older single-storey houses in Lagos" width="900" height="1195"></div>
+            <span class="badge-neutral absolute left-5 top-5 z-10 !bg-black/40 !text-white backdrop-blur">{% icon "building" 14 %} Chapter 01 · Rent</span>
+            <div class="absolute inset-x-5 bottom-5 z-10 rounded-xl border border-line bg-surface/90 p-5 shadow-raised backdrop-blur">
+              <div class="flex items-start justify-between gap-4">
+                <div><p class="eyebrow">Bank transfer</p><p class="mt-1 text-lead font-semibold">Adewale Properties Ltd</p><p class="meta tnum">Guaranty Trust Bank · ******6789</p></div>
+                <span class="badge-ok"><span class="dot"></span>Completed</span>
+              </div>
+              <div class="mt-4 space-y-1.5 border-t border-line pt-3 text-meta">
+                <div class="flex justify-between"><span class="text-muted">Collected from 4 people</span><span class="amount">₦600,000.00</span></div>
+                <div class="flex justify-between"><span class="text-muted">SplitStay service fee</span><span class="amount text-muted">−₦150.00</span></div>
+                <div class="flex justify-between text-body font-semibold"><span>Landlord received</span><span class="amount">₦599,850.00</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage-layer layer-1 overflow-hidden rounded-2xl">
+            <div class="duotone kenburns absolute inset-0"><img src="{% static 'img/story/light.jpg' %}" alt="A lineman working on an electricity pole beside a busy Nigerian road" width="900" height="1600" style="object-position:50% 30%"></div>
+            <span class="badge-neutral absolute left-5 top-5 z-10 !bg-black/40 !text-white backdrop-blur">{% icon "zap" 14 %} Chapter 02 · Light</span>
+            <div class="absolute inset-x-5 bottom-5 z-10 rounded-xl border border-line bg-surface/90 p-5 shadow-raised backdrop-blur">
+              <div class="flex items-start justify-between gap-4">
+                <div><p class="eyebrow">Electricity · prepaid</p><p class="mt-1 text-lead font-semibold">Ikeja Electric</p><p class="meta tnum">Meter ••••••5678</p></div>
+                <span class="badge-ok"><span class="dot"></span>Token issued</span>
+              </div>
+              <div class="mt-4 rounded-md border border-dashed border-line-strong bg-sunken px-4 py-3 text-center">
+                <p class="eyebrow">Your token · 438.2 kWh</p>
+                <p class="receipt-mono mt-1.5 text-section tracking-widest text-fg" id="typed-token" data-text="4821 9034 7712 5503 2268"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage-layer layer-2 overflow-hidden rounded-2xl border border-line bg-surface">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary-soft via-transparent to-transparent"></div>
+            <div class="relative flex h-full flex-col p-8">
+              <span class="badge-primary self-start">{% icon "repeat" 14 %} Chapter 03 · Upkeep</span>
+              <div class="mt-6 flex items-center gap-6">
+                <div class="relative h-28 w-28 flex-none">
+                  <svg viewBox="0 0 36 36" class="ring h-28 w-28"><circle class="track" cx="18" cy="18" r="15.9155" pathLength="100"/><circle class="arc" cx="18" cy="18" r="15.9155" pathLength="100"/></svg>
+                  <div class="absolute inset-0 grid place-items-center text-center"><div><p class="amount text-section leading-5 text-fg">₦150k</p><p class="text-micro normal-case tracking-normal text-muted">per cycle</p></div></div>
+                </div>
+                <div class="flex flex-wrap gap-2" id="months">
+                  <span class="month-chip badge-neutral on">Oct</span><span class="month-chip badge-neutral">Nov</span><span class="month-chip badge-neutral">Dec</span><span class="month-chip badge-neutral">Jan</span><span class="month-chip badge-neutral">Feb</span>
+                </div>
+              </div>
+              <ul class="mt-8 space-y-3.5">
+                <li><div class="flex justify-between text-meta"><span>Ada</span><span class="amount">₦45,000</span></div><div class="share-bar bar mt-1.5" style="--w:90%"><i></i></div></li>
+                <li><div class="flex justify-between text-meta"><span>Ngozi</span><span class="amount">₦45,000</span></div><div class="share-bar bar mt-1.5" style="--w:90%"><i></i></div></li>
+                <li><div class="flex justify-between text-meta"><span>Ibrahim</span><span class="amount">₦30,000</span></div><div class="share-bar bar mt-1.5" style="--w:60%"><i></i></div></li>
+                <li><div class="flex justify-between text-meta"><span>Chioma</span><span class="amount">₦30,000</span></div><div class="share-bar bar mt-1.5" style="--w:60%"><i></i></div></li>
+              </ul>
+              <p class="mt-auto flex items-center gap-2 text-meta text-muted">{% icon "bell" 16 "bell-ring" %} Reminders at 7, 3 and 1 day, and on the day, only for those who still owe.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ───────────────────────────── 4. FEATURES ───────────────────────────── #}
+<section class="force-dark relative overflow-hidden border-y border-line py-24 sm:py-32">
+  <div class="hero-bg opacity-60"></div>
+  <div class="page relative">
+    <div class="max-w-2xl">
+      <p class="reveal eyebrow">What it does</p>
+      <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg sm:text-5xl" style="--d:100ms">Built like a cooperative's ledger, not a payments demo.</h2>
+    </div>
+
+    <div class="mt-14 grid gap-4 md:grid-cols-3">
+
+      <div class="spot reveal p-6 md:col-span-2" data-spot>
+        <p class="eyebrow">Splits that match real life</p>
+        <h3 class="mt-2 text-section">Equal by default. Exact when it isn't.</h3>
+        <p class="mt-1 max-w-md text-body text-muted">Shares are worked out to the kobo and always add up to the target, however many people join or leave.</p>
+        <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+          <li><div class="flex justify-between text-meta"><span>Tunde</span><span class="amount">₦200,000.00</span></div><div class="share-bar bar mt-1.5" style="--w:100%"><i></i></div></li>
+          <li><div class="flex justify-between text-meta"><span>Ada</span><span class="amount">₦133,333.34</span></div><div class="share-bar bar mt-1.5" style="--w:67%"><i></i></div></li>
+          <li><div class="flex justify-between text-meta"><span>Chioma</span><span class="amount">₦133,333.33</span></div><div class="share-bar bar mt-1.5" style="--w:67%"><i></i></div></li>
+          <li><div class="flex justify-between text-meta"><span>Ibrahim</span><span class="amount">₦133,333.33</span></div><div class="share-bar bar mt-1.5" style="--w:67%"><i></i></div></li>
+        </ul>
+      </div>
+
+      <div class="spot reveal p-6" data-spot style="--d:80ms">
+        <p class="eyebrow">Open to everyone</p>
+        <h3 class="mt-2 text-section">A ledger every member can read.</h3>
+        <ul class="mt-5 space-y-2.5 text-meta">
+          <li class="flex items-center gap-2.5"><span class="grid h-6 w-6 place-items-center rounded-full bg-ok-soft text-ok">{% icon "plus" 12 %}</span><span class="flex-1">Ada paid</span><span class="amount">+₦133,333.34</span></li>
+          <li class="flex items-center gap-2.5"><span class="grid h-6 w-6 place-items-center rounded-full bg-ok-soft text-ok">{% icon "plus" 12 %}</span><span class="flex-1">Tunde paid</span><span class="amount">+₦200,000.00</span></li>
+          <li class="flex items-center gap-2.5"><span class="grid h-6 w-6 place-items-center rounded-full bg-sunken text-muted">{% icon "receipt" 12 %}</span><span class="flex-1 text-muted">Service fee</span><span class="amount text-muted">−₦150.00</span></li>
+        </ul>
+      </div>
+
+      <div class="spot reveal p-6" data-spot style="--d:0ms">
+        <p class="eyebrow">Pays directly</p>
+        <h3 class="mt-2 text-section">From the pot to the biller. Never through a person.</h3>
+        <svg viewBox="0 0 260 96" class="mt-4 w-full text-primary" fill="none" aria-hidden="true">
+          <circle cx="30" cy="48" r="22" stroke="currentColor" stroke-width="1.5"/><path d="M18 52q6-4 12 0t12 0" stroke="currentColor" stroke-width="1.5"/>
+          <path class="flow-dash" d="M54 48C110 48 120 20 176 20" stroke="currentColor" stroke-width="1.5"/>
+          <path class="flow-dash" d="M54 48C110 48 120 76 176 76" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="178" y="6" width="76" height="28" rx="8" stroke="currentColor" stroke-width="1.5"/><text x="216" y="24" text-anchor="middle" font-size="10" fill="currentColor" font-family="Inter,sans-serif">Landlord</text>
+          <rect x="178" y="62" width="76" height="28" rx="8" stroke="currentColor" stroke-width="1.5"/><text x="216" y="80" text-anchor="middle" font-size="10" fill="currentColor" font-family="Inter,sans-serif">Disco</text>
+        </svg>
+      </div>
+
+      <div class="spot reveal p-6" data-spot style="--d:80ms">
+        <p class="eyebrow">Fees in plain sight</p>
+        <h3 class="mt-2 text-section">One line. Always shown.</h3>
+        <dl class="mt-5 space-y-2 text-meta">
+          <div class="flex justify-between"><dt class="text-muted">Collected</dt><dd class="amount">₦600,000.00</dd></div>
+          <div class="flex items-center justify-between rounded-md bg-primary-soft px-2 py-1.5 text-primary"><dt class="flex items-center gap-2"><span class="pulse-dot h-1.5 w-1.5 rounded-full bg-primary"></span>SplitStay fee</dt><dd class="amount">−₦150.00</dd></div>
+          <div class="flex justify-between border-t border-line pt-2 text-body font-semibold"><dt>Paid out</dt><dd class="amount">₦599,850.00</dd></div>
+        </dl>
+      </div>
+
+      <div class="spot reveal p-6" data-spot style="--d:160ms">
+        <p class="eyebrow">Opens itself again</p>
+        <h3 class="mt-2 text-section">Same people. Same split. Next month.</h3>
+        <div class="mt-5 flex items-center gap-4">
+          <svg viewBox="0 0 36 36" class="ring h-16 w-16 flex-none"><circle class="track" cx="18" cy="18" r="15.9155" pathLength="100"/><circle class="arc" cx="18" cy="18" r="15.9155" pathLength="100"/></svg>
+          <p class="text-meta text-muted">Anchored to the original date, so a 31 Jan group lands on 28 Feb, then 31 Mar.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{# ───────────────────────────── 5. HOW IT WORKS ───────────────────────────── #}
+<section class="py-24 sm:py-32">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+      <p class="reveal eyebrow">How it works</p>
+      <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg" style="--d:100ms">Four steps. The last one is automatic.</h2>
+    </div>
+
+    <div class="reveal lg:col-span-8" style="--d:150ms" x-data="{ tab: 0, steps: [
+      { t: 'Start', h: 'Set the target and who is in.', p: 'Name it, set the amount and due date, then say where the money goes: a bank account, or a meter number. Invite people by email or phone. Shares are split for you.' },
+      { t: 'Pay', h: 'Everyone pays only their own share.', p: 'Card, bank transfer or USSD through Paystack. Nobody can pay on someone else\'s behalf, and nobody can be charged twice for the same payment.' },
+      { t: 'Watch', h: 'The pot fills where everyone can see.', p: 'Contributions appear in the ledger the moment they are confirmed. The group page updates by itself, so you see it fill without refreshing.' },
+      { t: 'Paid', h: 'Target reached. The payment goes out.', p: 'The bill is paid or the transfer is sent, the fee is recorded on its own line, and a receipt with the electricity token or transfer reference is filed for the group.' }
+    ] }">
+      <div class="relative grid grid-cols-4 rounded-xl border border-line bg-sunken p-1" role="tablist">
+        <span class="tab-pill" :style="'transform: translateX(' + (tab * 100) + '%)'"></span>
+        <template x-for="(s, i) in steps" :key="i">
+          <button type="button" role="tab" class="relative z-10 rounded-lg px-2 py-2.5 text-body font-medium transition-colors" :class="tab === i ? 'text-fg' : 'text-muted hover:text-fg'" @click="tab = i" :aria-selected="tab === i">
+            <span class="tnum mr-1 text-meta opacity-60" x-text="'0' + (i + 1)"></span><span x-text="s.t"></span>
+          </button>
+        </template>
+      </div>
+      <div class="mt-8 min-h-[11rem]">
+        <template x-for="(s, i) in steps" :key="i">
+          <div x-show="tab === i" x-cloak class="panel-in">
+            <h3 class="text-title text-fg" x-text="s.h"></h3>
+            <p class="mt-3 max-w-2xl text-lead text-muted" x-text="s.p"></p>
+          </div>
+        </template>
+      </div>
+      <div class="mt-4 h-1 overflow-hidden rounded-full bg-sunken"><div class="h-full rounded-full bg-primary transition-[width] duration-700" style="transition-timing-function:cubic-bezier(.3,1.25,.4,1)" :style="'width:' + ((tab + 1) * 25) + '%'"></div></div>
+    </div>
+  </div>
+</section>
+
+{# ───────────────────────────── 6. FACTS ───────────────────────────── #}
+<section class="border-y border-line py-16">
+  <dl class="page grid grid-cols-2 gap-y-10 lg:grid-cols-4">
+    <div class="reveal"><dd class="text-display text-fg tnum"><span data-count="12">12</span></dd><dt class="mt-1 text-body text-muted">electricity companies supported</dt></div>
+    <div class="reveal" style="--d:80ms"><dd class="text-display text-fg tnum"><span data-count="1">1</span> kobo</dd><dt class="mt-1 text-body text-muted">is the most a split can be off by, and it is never off</dt></div>
+    <div class="reveal" style="--d:160ms"><dd class="text-display text-fg tnum"><span data-count="100">100</span>%</dd><dt class="mt-1 text-body text-muted">of entries visible to every member</dt></div>
+    <div class="reveal" style="--d:240ms"><dd class="text-display text-fg tnum"><span data-count="5">5</span> s</dd><dt class="mt-1 text-body text-muted">for a payment to show up on your screen</dt></div>
+  </dl>
+</section>
+
+{# ───────────────────────────── 7. GUIDE TEASER (the full guide has its own page) ───────────────────────────── #}
+<section class="py-20 sm:py-24">
+  <div class="page">
+    <div class="spot reveal grid gap-8 p-8 sm:p-10 lg:grid-cols-12 lg:items-center" data-spot>
+      <div class="lg:col-span-7">
+        <p class="eyebrow">New to this?</p>
+        <h2 class="mt-3 text-[2rem] font-semibold leading-[1.1] tracking-[-0.025em] text-fg sm:text-4xl">A complete guide, written so anyone can follow it.</h2>
+        <p class="mt-4 max-w-xl text-lead text-muted">From making an account to reading your receipt, every step in plain language with the exact button names. Students sharing a flat can be up and running in minutes.</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="{% url 'web:guide' %}" class="btn-primary">Read the guide {% icon "arrow-right" 18 %}</a>
+          <a href="{% url 'web:pricing' %}" class="btn-secondary">See the fees</a>
+        </div>
+      </div>
+      <ol class="grid gap-3 text-body lg:col-span-5">
+        <li class="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3"><span class="tnum text-primary">1</span> Get started</li>
+        <li class="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3"><span class="tnum text-primary">2</span> Start or join a group</li>
+        <li class="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3"><span class="tnum text-primary">3</span> Pay your share and watch it fill</li>
+        <li class="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3"><span class="tnum text-primary">4</span> The payout, the token and the receipt</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+{# ───────────────────────────── 8. CTA ───────────────────────────── #}
+<section class="force-dark relative overflow-hidden py-24 sm:py-32">
+  <div class="hero-bg"></div>
+  <div class="page relative text-center">
+    <h2 class="reveal mx-auto max-w-3xl text-[2.5rem] font-semibold leading-[1.04] tracking-[-0.035em] text-fg sm:text-6xl">Start the group. Send the link. Stop chasing.</h2>
+    <p class="reveal mx-auto mt-5 max-w-xl text-lead text-muted" style="--d:120ms">Free to start. The only charge is a small, itemised fee when the money goes out.</p>
+    <div class="reveal mt-9 flex flex-wrap justify-center gap-3" style="--d:220ms">
+      {% if user.is_authenticated %}
+      <a href="{% url 'web:group_new' %}" class="btn-primary magnetic !px-7 !py-3.5 text-lead" data-magnetic>Create your group {% icon "arrow-right" 20 %}</a>
+      <a href="{% url 'web:dashboard' %}" class="btn-secondary !px-6 !py-3.5 text-lead">Back to my dashboard</a>
+      {% else %}
+      <a href="{% url 'web:register' %}" class="btn-primary magnetic !px-7 !py-3.5 text-lead" data-magnetic>Create your group {% icon "arrow-right" 20 %}</a>
+      <a href="{% url 'web:login' %}" class="btn-secondary !px-6 !py-3.5 text-lead">I already have an account</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="border-t border-line py-4">
+  <p class="page text-micro normal-case tracking-normal text-muted">Photographs via Wikimedia Commons, CC BY-SA 4.0: “Bedroom Apartments Building” by Grace789; “Phcn in Nigeria” by Tunde Olowookere. Shown in the product story with a navy tint. See <a class="underline" href="{% url 'web:about' %}">About</a> for how we handle money.</p>
 </div>
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock %}

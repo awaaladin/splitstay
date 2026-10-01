@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Privacy · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <article class="mx-auto max-w-3xl legal">
+    <p class="eyebrow">Legal</p>
+    <h1 class="page-title mt-1 !text-[2.25rem] !leading-[2.5rem]">Privacy</h1>
+    <p class="meta mt-2">Last updated 1 October 2026</p>
+    <p class="mt-6 text-lead text-muted">This explains what SplitStay collects, why, who sees it, and the choices you have. We have tried to write it in plain language.</p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li><b>Account details:</b> your name, email address, optional phone number and a password (stored only as a one-way hash).</li>
+      <li><b>Group activity:</b> the groups you create or join, your share, your contributions, and payouts, fees and receipts for those groups.</li>
+      <li><b>Bank details:</b> if you save them, your bank, account name and account number. The number is encrypted, and only its last four digits are ever shown.</li>
+      <li><b>Messages and notifications:</b> what you send us through the contact form, and in-app notifications about your groups.</li>
+      <li><b>Technical data:</b> basic logs such as IP address and browser, used to keep the service secure and working.</li>
+    </ul>
+
+    <h2>Why we use it</h2>
+    <p>To run your groups: to collect payments, pay bills and transfers, show the ledger to members, send reminders, and answer your questions. We also use it to prevent fraud and abuse and to meet legal obligations.</p>
+
+    <h2>Who can see what</h2>
+    <ul>
+      <li><b>Other members of a group</b> see your name, your share, whether you have paid, and your contributions in that group. That openness is how the service works.</li>
+      <li><b>People who are not in the group</b> see nothing about it.</li>
+      <li><b>Service providers</b> process data on our behalf: our payment company (Paystack) for collecting payments and sending transfers, our bill provider (for example VTpass) for paying electricity bills, and our hosting and database providers. They receive only what they need to do that job.</li>
+    </ul>
+    <p>We do not sell your personal data.</p>
+
+    <h2>How long we keep it</h2>
+    <p>Payment, ledger and receipt records are kept as long as needed to keep groups accurate and to meet financial record-keeping duties. Other data is kept while your account is active and removed or anonymised when it is no longer needed.</p>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li>You can update your name, phone number and bank details in <b>Settings</b>, and remove your saved bank account at any time.</li>
+      <li>You can ask for a copy of your data, or for corrections or deletion, through the <a href="{% url 'web:contact' %}">contact form</a>. Records that must be kept for financial reasons, such as a payment that already happened in a group, may be retained.</li>
+    </ul>
+
+    <h2>Security</h2>
+    <p>Connections are encrypted, bank account numbers are encrypted at rest, passwords are hashed, and access to administrative tools is restricted. No system is perfectly secure, so please use a strong, unique password.</p>
+
+    <h2>Changes</h2>
+    <p>If we change this page in a way that matters, we will say so in the app. Questions? Use the <a href="{% url 'web:contact' %}">contact form</a>.</p>
+  </article>
+</div>
+{% endblock %}

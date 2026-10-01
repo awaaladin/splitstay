@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static cp %}
+{% block title %}About · SplitStay{% endblock %}
+{% block description %}Why SplitStay exists, how it handles your money, and what it deliberately does not do.{% endblock %}
+{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}</style></noscript>{% endblock %}
+{% block main_class %}{% endblock %}
+{% block content %}
+<section class="force-dark relative overflow-hidden border-b border-line">
+  <div class="hero-bg"></div>
+  <div class="page relative py-20 sm:py-28">
+    <p class="reveal eyebrow">About SplitStay</p>
+    <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">Built on an old idea: money is easier when everyone can see it.</h1>
+    <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">In an <em>ajo</em> or <em>esusu</em> circle, trust doesn't come from a company. It comes from the fact that everyone can see who has paid. SplitStay brings that to rent, light bills and family upkeep, and adds the part that is hardest to do by hand: paying the bill directly.</p>
+  </div>
+</section>
+
+<section class="py-20 sm:py-28">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">The problem</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">Someone always ends up being the bank.</h2></div>
+    <div class="reveal space-y-5 text-lead text-muted lg:col-span-8" style="--d:120ms">
+      <p>Four people share a flat. One person pays the landlord and then spends two weeks asking for their money back. Another pays the light bill "for now" and quietly absorbs a loss. Families do the same with upkeep: the one who earns most becomes the treasurer, and the spreadsheet lives in their head.</p>
+      <p>It is rarely about the money itself. It is about the awkwardness: chasing friends, doubting who paid, and being unable to prove it either way.</p>
+    </div>
+  </div>
+</section>
+
+<section class="border-y border-line py-20 sm:py-28">
+  <div class="page">
+    <p class="reveal eyebrow">What we believe</p>
+    <div class="mt-8 grid gap-6 md:grid-cols-3">
+      <div class="spot reveal p-6" data-spot><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "users" 20 %}</span><h3 class="mt-4 text-section">Everyone sees everything</h3><p class="mt-2 text-body text-muted">The ledger is open to every member, not just the admin. Who paid, when, how much, and what was paid out. Nothing is hidden and nothing is edited after the fact.</p></div>
+      <div class="spot reveal p-6" data-spot style="--d:80ms"><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "receipt" 20 %}</span><h3 class="mt-4 text-section">Fees you can point to</h3><p class="mt-2 text-body text-muted">Our fee is one line, recorded like any other entry, and shown before and after the payout. No silent deductions, no percentage buried in an exchange rate.</p></div>
+      <div class="spot reveal p-6" data-spot style="--d:160ms"><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "shield-check" 20 %}</span><h3 class="mt-4 text-section">Never a lender</h3><p class="mt-2 text-body text-muted">We never pay a bill and wait to be reimbursed. Money moves out only once your group has put it in, so nobody ends up in debt to the platform.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 sm:py-28">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">How we handle your money</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">Plainly, step by step.</h2></div>
+    <ol class="reveal space-y-6 lg:col-span-8" style="--d:120ms">
+      <li class="flex gap-4"><span class="tnum text-section text-primary">01</span><p class="text-body text-muted"><b class="font-semibold text-fg">Collection.</b> Each person pays their own share through Paystack, using a card, bank transfer or USSD. We never see your card details.</p></li>
+      <li class="flex gap-4"><span class="tnum text-section text-primary">02</span><p class="text-body text-muted"><b class="font-semibold text-fg">Counting.</b> A group's total is always added up from confirmed payments, never kept as a separate number that can drift. A payment is counted once, even if the payment company tells us twice.</p></li>
+      <li class="flex gap-4"><span class="tnum text-section text-primary">03</span><p class="text-body text-muted"><b class="font-semibold text-fg">Payout.</b> When the target is met, the bill is paid or the transfer is sent automatically, to the destination the group was created with. If an attempt is uncertain, we check with the provider rather than risk paying twice.</p></li>
+      <li class="flex gap-4"><span class="tnum text-section text-primary">04</span><p class="text-body text-muted"><b class="font-semibold text-fg">Protection.</b> Bank account numbers are encrypted at rest and only the last four digits are ever displayed.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="force-dark border-t border-line py-20">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">Straight about the limits</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">What it doesn't do yet.</h2></div>
+    <ul class="reveal space-y-3 text-body text-muted lg:col-span-8" style="--d:120ms">
+      <li class="flex gap-3">{% icon "x" 18 "mt-1 flex-none" %}<span><b class="font-semibold text-fg">No refunds yet.</b> That is why a group that has received money is paid out rather than cancelled, and why members and shares lock after the first payment.</span></li>
+      <li class="flex gap-3">{% icon "x" 18 "mt-1 flex-none" %}<span><b class="font-semibold text-fg">Electricity bills only, for now.</b> Rent, family and custom groups pay by bank transfer. Airtime, cable and water are planned.</span></li>
+      <li class="flex gap-3">{% icon "x" 18 "mt-1 flex-none" %}<span><b class="font-semibold text-fg">Members need an account first.</b> You can invite only people who have already registered.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="page flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+    <h2 class="text-title text-fg">Questions before you start?</h2>
+    <div class="flex gap-3"><a href="{% url 'web:guide' %}" class="btn-secondary">Read the guide</a><a href="{% url 'web:contact' %}" class="btn-primary">Contact us</a></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock %}

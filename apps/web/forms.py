@@ -147,6 +147,26 @@ class GroupForm(forms.Form):
         return fields
 
 
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=120, widget=forms.TextInput(attrs={"autocomplete": "name"}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"autocomplete": "email"}), help_text="So we can reply to you.")
+    topic = forms.ChoiceField(choices=[], label="What is it about?")
+    reference = forms.CharField(max_length=60, required=False, label="Group name or payment reference (optional)")
+    message = forms.CharField(max_length=4000, widget=forms.Textarea(attrs={"rows": 6}), help_text="Tell us what happened, in your own words. Never send your password or a full card number.")
+    website = forms.CharField(required=False, widget=forms.TextInput(attrs={"tabindex": "-1", "autocomplete": "off"}), label="Leave this empty")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .models import ContactMessage
+
+        self.fields["topic"].choices = ContactMessage.Topic.choices
+
+    def clean_website(self):
+        if self.cleaned_data.get("website"):
+            raise forms.ValidationError("Spam detected.")  # a hidden field only bots fill in
+        return ""
+
+
 class InviteForm(forms.Form):
     identifier = forms.CharField(label="Email or phone number")
     contribution_share = forms.DecimalField(max_digits=14, decimal_places=2, min_value=1, required=False, label="Custom share (₦)")

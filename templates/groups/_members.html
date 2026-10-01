@@ -21,7 +21,7 @@
             {% if r.paid and r.state != 'paid' %} · paid {{ r.paid|naira }}{% endif %}
           </p>
         </div>
-        <div class="flex flex-none items-center gap-2 text-right">
+        <div class="flex flex-none items-center gap-1 text-right sm:gap-2">
           <span class="{% if r.state == 'paid' %}state-flip{% endif %}">{% status_badge "member" r.state %}</span>
           {% if can_manage_members %}
             <button type="button" class="btn-quiet !p-1.5" aria-label="Edit {{ r.user.display_name }}'s share"

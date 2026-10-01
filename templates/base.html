@@ -37,7 +37,7 @@
   <div id="boot" aria-hidden="true">
     <div class="loader-stack">
       {% logo_mark "boot" 68 %}
-      <div class="loader-word">Contrib<span>Pay</span></div>
+      <div class="loader-word">Split<span>Stay</span></div>
     </div>
   </div>
 
@@ -55,7 +55,7 @@
     <div class="page flex h-16 items-center gap-3">
       <a href="{% if user.is_authenticated %}{% url 'web:dashboard' %}{% else %}{% url 'web:landing' %}{% endif %}" class="flex items-center gap-2.5 text-primary" aria-label="SplitStay home">
         {% logo_mark "nav" 30 %}
-        <span class="text-lead font-semibold tracking-tight text-fg">Contrib<span class="text-primary">Pay</span></span>
+        <span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Stay</span></span>
       </a>
 
       {% if user.is_authenticated %}
@@ -63,10 +63,18 @@
         <a class="nav-link" href="{% url 'web:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
         <a class="nav-link" href="{% url 'web:notifications' %}" {% if request.resolver_match.url_name == 'notifications' %}aria-current="page"{% endif %}>Activity</a>
         <a class="nav-link" href="{% url 'web:settings' %}" {% if request.resolver_match.url_name == 'settings' %}aria-current="page"{% endif %}>Settings</a>
+        <a class="nav-link" href="{% url 'web:guide' %}" {% if request.resolver_match.url_name == 'guide' %}aria-current="page"{% endif %}>Guide</a>
+      </nav>
+      {% else %}
+      <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="Main">
+        <a class="nav-link" href="{% url 'web:guide' %}" {% if request.resolver_match.url_name == 'guide' %}aria-current="page"{% endif %}>How to use</a>
+        <a class="nav-link" href="{% url 'web:pricing' %}" {% if request.resolver_match.url_name == 'pricing' %}aria-current="page"{% endif %}>Fees</a>
+        <a class="nav-link" href="{% url 'web:about' %}" {% if request.resolver_match.url_name == 'about' %}aria-current="page"{% endif %}>About</a>
+        <a class="nav-link" href="{% url 'web:contact' %}" {% if request.resolver_match.url_name == 'contact' %}aria-current="page"{% endif %}>Contact</a>
       </nav>
       {% endif %}
 
-      <div class="ml-auto flex items-center gap-1.5">
+      <div class="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1.5">
         {# Theme toggle: persists to localStorage, follows the system on first visit #}
         <button type="button" class="btn-quiet !p-2" x-data="themeToggle()" @click="toggle()" :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'" :aria-pressed="dark">
           <span x-show="!dark">{% icon "moon" 20 %}</span>
@@ -91,10 +99,10 @@
         </div>
 
         <div class="relative" x-data="{ open: false }" @keydown.escape="open = false" @click.outside="open = false">
-          <button type="button" class="flex items-center gap-2 rounded-md p-1.5 pr-2 hover:bg-sunken" @click="open = !open" :aria-expanded="open" aria-label="Account menu">
+          <button type="button" class="flex items-center gap-2 rounded-md p-1 hover:bg-sunken sm:p-1.5 sm:pr-2" @click="open = !open" :aria-expanded="open" aria-label="Account menu">
             <span class="grid h-8 w-8 place-items-center rounded-full bg-primary text-meta font-semibold text-on-primary">{{ user.initials }}</span>
             <span class="hidden max-w-[10rem] truncate text-body font-medium sm:block">{{ user.display_name }}</span>
-            {% icon "chevron-down" 16 "text-muted" %}
+            {% icon "chevron-down" 16 "text-muted hidden sm:block" %}
           </button>
           <div class="menu right-0" x-show="open" x-cloak x-transition.origin.top.right.duration.120ms>
             <div class="border-b border-line px-3 py-2"><p class="truncate text-meta text-muted">{{ user.email }}</p></div>
@@ -117,6 +125,8 @@
         <a class="nav-link" href="{% url 'web:dashboard' %}">Dashboard</a>
         <a class="nav-link" href="{% url 'web:notifications' %}">Activity</a>
         <a class="nav-link" href="{% url 'web:settings' %}">Settings</a>
+        <a class="nav-link" href="{% url 'web:guide' %}">Guide</a>
+        <a class="nav-link" href="{% url 'web:contact' %}">Contact</a>
       </div>
     </nav>
     {% endif %}
@@ -138,13 +148,41 @@
   </div>
   {% endif %}
 
-  <main id="main" class="flex-1 py-8 sm:py-10 page-enter">
+  <main id="main" class="flex-1 {% block main_class %}py-8 sm:py-10 page-enter{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="border-t border-line py-8">
-    <div class="page flex flex-col gap-3 text-meta text-muted sm:flex-row sm:items-center sm:justify-between">
-      <p>© {% now "Y" %} SplitStay. Contributions are collected by Paystack; SplitStay never lends money on anyone's behalf.</p>
+  <footer class="border-t border-line py-12 no-print">
+    <div class="page grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
+      <div class="lg:col-span-3">
+        <a href="/" class="flex items-center gap-2.5 text-primary" aria-label="SplitStay home">{% logo_mark "foot" 26 %}<span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Stay</span></span></a>
+        <p class="mt-4 max-w-sm text-body text-muted">Group contributions for rent, light bills and family upkeep, paid out directly and recorded in the open.</p>
+      </div>
+      <div>
+        <p class="eyebrow">Product</p>
+        <ul class="mt-3 space-y-2 text-body">
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:guide' %}">How to use it</a></li>
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:pricing' %}">Fees</a></li>
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:about' %}">About</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Support</p>
+        <ul class="mt-3 space-y-2 text-body">
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:contact' %}">Contact us</a></li>
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:guide' %}#g-faq">Common questions</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Legal</p>
+        <ul class="mt-3 space-y-2 text-body">
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:privacy' %}">Privacy</a></li>
+          <li><a class="text-muted hover:text-fg" href="{% url 'web:terms' %}">Terms of use</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="page mt-10 flex flex-col gap-2 border-t border-line pt-6 text-meta text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>© {% now "Y" %} SplitStay. Payments are collected by Paystack. SplitStay never lends money on anyone's behalf.</p>
       <p class="flex items-center gap-2">{% icon "shield-check" 16 %} Every naira is recorded in the group ledger.</p>
     </div>
   </footer>

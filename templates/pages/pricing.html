@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static cp %}
+{% block title %}Fees · SplitStay{% endblock %}
+{% block description %}Free to start. One small, itemised fee when the money goes out.{% endblock %}
+{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}</style></noscript>{% endblock %}
+{% block main_class %}{% endblock %}
+{% block content %}
+<section class="py-16 sm:py-24">
+  <div class="page">
+    <p class="reveal eyebrow">Fees</p>
+    <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">Free until the money goes out. Then one line.</h1>
+    <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">Creating a group, inviting people and paying your share costs nothing with us. When a group is paid out, SplitStay takes one fee from the pooled money. It is shown in the group summary before you start, and as its own entry on the ledger and the receipt afterwards.</p>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-12 [&>*]:min-w-0">
+      <div class="spot reveal p-6 sm:p-7 lg:col-span-4" data-spot>
+        <p class="eyebrow">Current service fee</p>
+        {% if fee.type == 'percent' %}
+          <p class="amount mt-3 text-display text-fg">{{ fee.percent|floatformat:"-2" }}%</p>
+          <p class="mt-1 text-body text-muted">of the amount paid out</p>
+        {% else %}
+          <p class="amount mt-3 text-display text-fg">{{ fee.flat|naira_short }}</p>
+          <p class="mt-1 text-body text-muted">flat, per payout. Not per person.</p>
+        {% endif %}
+        <ul class="mt-6 space-y-2.5 border-t border-line pt-5 text-body text-muted">
+          <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Creating and joining groups: free</li>
+          <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Paying your share: free</li>
+          <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Receipts and ledger: free</li>
+          <li class="flex gap-2.5">{% icon "info" 18 "mt-0.5 text-primary flex-none" %} The payment company (Paystack) may add its own card or transfer charge at checkout, which is shown there.</li>
+        </ul>
+      </div>
+
+      <div class="reveal lg:col-span-8" style="--d:120ms">
+        <div class="card overflow-hidden">
+          <div class="border-b border-line px-6 py-4"><h2 class="section-title">What it looks like in practice</h2><p class="meta mt-0.5">Worked out from the live fee setting.</p></div>
+          <div class="overflow-x-auto">
+          <table class="w-full text-left text-body">
+            <thead><tr class="table-head border-b border-line"><th class="px-4 py-3 font-semibold sm:px-6">Group collects</th><th class="px-2 py-3 font-semibold sm:px-3">Fee</th><th class="px-4 py-3 text-right font-semibold sm:px-6">Paid out</th></tr></thead>
+            <tbody class="divide-line">
+              {% for e in examples %}
+              <tr class="border-b border-line last:border-0"><td class="amount whitespace-nowrap px-4 py-4 sm:px-6">{{ e.pool|naira_short }}</td><td class="amount whitespace-nowrap px-2 py-4 text-muted sm:px-3">−{{ e.fee|naira_short }}</td><td class="amount whitespace-nowrap px-4 py-4 text-right sm:px-6">{{ e.net|naira }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <div class="alert-info mt-5">{% icon "info" 20 "mt-0.5 flex-none text-primary" %}<p><b class="font-semibold">Covering a bill exactly?</b> The fee comes out of the pool, so set the target a little above the bill. The group form shows the fee and the net amount as you type.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="force-dark border-t border-line py-16">
+  <div class="page grid gap-8 md:grid-cols-3">
+    <div><h3 class="text-section">No hidden deductions</h3><p class="mt-2 text-body text-muted">The fee is recorded as a separate entry, never subtracted silently from someone's share.</p></div>
+    <div><h3 class="text-section">No fee on failure</h3><p class="mt-2 text-body text-muted">If a payment to a bill or bank fails, your money stays in the pot and the admin can retry. The fee is part of the payout record, not a charge on top.</p></div>
+    <div><h3 class="text-section">No lending, no interest</h3><p class="mt-2 text-body text-muted">We never advance money on anyone's behalf, so there is nothing to charge interest on.</p></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock %}

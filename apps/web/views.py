@@ -117,6 +117,62 @@ def landing(request):
     return render(request, "landing.html")
 
 
+def guide(request):
+    """The complete start-to-finish user guide. Public, and also linked from the signed-in nav."""
+    return render(request, "guide.html")
+
+
+def about(request):
+    return render(request, "pages/about.html")
+
+
+def pricing(request):
+    """Fees page. Examples are computed from the live fee settings, so the page can't drift from reality."""
+    from apps.payouts.fees import quote_fee
+
+    examples = []
+    for pool in (Decimal("30000"), Decimal("150000"), Decimal("600000")):
+        quote = quote_fee(pool)
+        examples.append({"pool": pool, "fee": quote.amount, "net": quote.net(pool)})
+    return render(request, "pages/pricing.html", {"fee": _fee_policy(), "examples": examples})
+
+
+def privacy(request):
+    return render(request, "pages/privacy.html")
+
+
+def terms(request):
+    return render(request, "pages/terms.html")
+
+
+def contact(request):
+    from django.core.cache import cache
+
+    from .forms import ContactForm
+    from .models import ContactMessage
+
+    initial = {}
+    if request.user.is_authenticated:
+        initial = {"name": request.user.display_name, "email": request.user.email}
+    form = ContactForm(request.POST or None, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        ip = request.META.get("HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")).split(",")[0].strip()
+        key = f"contact:{ip}"
+        sent = cache.get(key, 0)
+        if sent >= 5:
+            messages.error(request, "You've sent several messages in a short time. Please try again in an hour.")
+        else:
+            cache.set(key, sent + 1, 3600)
+            data = form.cleaned_data
+            ContactMessage.objects.create(
+                name=data["name"], email=data["email"], topic=data["topic"], message=data["message"],
+                reference=data.get("reference", ""), user=request.user if request.user.is_authenticated else None,
+            )
+            messages.success(request, "Thanks. Your message has been received and we'll reply by email.")
+            return redirect("web:contact")
+    return render(request, "pages/contact.html", {"form": form})
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect("web:dashboard")

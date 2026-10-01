@@ -15,7 +15,7 @@ class PublicPageTests(TestCase):
         for name in ("web:landing", "web:login", "web:register"):
             res = self.client.get(reverse(name))
             self.assertEqual(res.status_code, 200, name)
-        self.assertContains(self.client.get(reverse("web:landing")), "Shared costs")
+        self.assertContains(self.client.get(reverse("web:landing")), "Nobody chases anybody for money")
 
     def test_dark_mode_and_theme_toggle_present(self):
         html = self.client.get(reverse("web:landing")).content.decode()

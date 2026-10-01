@@ -6,6 +6,12 @@ app_name = "web"
 
 urlpatterns = [
     path("", views.landing, name="landing"),
+    path("guide/", views.guide, name="guide"),
+    path("about/", views.about, name="about"),
+    path("fees/", views.pricing, name="pricing"),
+    path("contact/", views.contact, name="contact"),
+    path("privacy/", views.privacy, name="privacy"),
+    path("terms/", views.terms, name="terms"),
     path("login/", views.login_view, name="login"),
     path("register/", views.register, name="register"),
     path("logout/", views.logout_view, name="logout"),

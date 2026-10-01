@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static cp %}
+{% block title %}How to use SplitStay · The complete guide{% endblock %}
+{% block description %}A step-by-step guide to SplitStay, from creating an account to reading your receipt. Written so anyone can follow it.{% endblock %}
+{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}</style></noscript>{% endblock %}
+{% block main_class %}{% endblock %}
+{% block content %}
+{% include "partials/guide.html" %}
+<section class="force-dark border-t border-line py-16">
+  <div class="page flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+    <div><h2 class="text-title text-fg">Ready to try it?</h2><p class="mt-1 text-body text-muted">It takes about two minutes to start your first group.</p></div>
+    <div class="flex gap-3">
+      {% if user.is_authenticated %}<a href="{% url 'web:group_new' %}" class="btn-primary">Start a group {% icon "arrow-right" 18 %}</a>
+      {% else %}<a href="{% url 'web:register' %}" class="btn-primary">Create your account {% icon "arrow-right" 18 %}</a>{% endif %}
+      <a href="{% url 'web:contact' %}" class="btn-secondary">Ask us a question</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock %}

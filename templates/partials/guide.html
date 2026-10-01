@@ -1,0 +1,232 @@
+{% load cp %}
+{# The complete guide: every step from creating an account to reading the receipt. Plain language, exact button names. #}
+<section id="guide" class="border-t border-line py-24 sm:py-32">
+  <div class="page">
+    <div class="max-w-3xl">
+      <p class="reveal eyebrow">The complete guide</p>
+      <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg sm:text-5xl" style="--d:100ms">Never used it before? Start here and follow along.</h2>
+      <p class="reveal mt-5 text-lead text-muted" style="--d:200ms">This guide takes you from nothing to a paid bill, one small step at a time. No jargon, and no step you can't undo before money is involved. A good example to keep in mind: <strong class="font-medium text-fg">four students in an off-campus flat who need to pay the rent, the light and the Wi-Fi without anyone being the "bank".</strong></p>
+    </div>
+
+    <div class="mt-14 grid gap-12 lg:grid-cols-12">
+
+      {# Table of contents: follows your scroll position #}
+      <nav class="hidden lg:col-span-3 lg:block" aria-label="Guide contents">
+        <ol class="sticky top-24 space-y-1 border-l border-line text-body" id="guide-toc">
+          <li><a href="#g-start" class="toc-link">1 · Get started</a></li>
+          <li><a href="#g-create" class="toc-link">2 · Start a group</a></li>
+          <li><a href="#g-join" class="toc-link">3 · Join a group</a></li>
+          <li><a href="#g-pay" class="toc-link">4 · Pay your share</a></li>
+          <li><a href="#g-watch" class="toc-link">5 · Watch it fill</a></li>
+          <li><a href="#g-payout" class="toc-link">6 · The payout and receipt</a></li>
+          <li><a href="#g-manage" class="toc-link">7 · Managing a group</a></li>
+          <li><a href="#g-words" class="toc-link">8 · Words explained</a></li>
+          <li><a href="#g-faq" class="toc-link">9 · Questions</a></li>
+        </ol>
+      </nav>
+
+      <div class="space-y-20 lg:col-span-9">
+
+        {# ───── 1. GET STARTED ───── #}
+        <section id="g-start" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">1</span> Get started</h3>
+
+          <ol class="guide-steps">
+            <li>
+              <h4>Create your account</h4>
+              <p>Press <b>Create account</b> at the top right. Fill in your full name, your email address and a password of at least 8 characters. The phone number is optional, but add it: friends can then invite you with your number, and you can sign in with it too.</p>
+              <p class="guide-tip">{% icon "info" 16 %} <span><b>Tip.</b> Use an email you check often. Group invitations and payment confirmations show up in the app, and your email is your sign-in name.</span></p>
+            </li>
+            <li>
+              <h4>Sign in later with email or phone</h4>
+              <p>On the <b>Sign in</b> page, type your email <em>or</em> your phone number in the first box and your password in the second. Forgot which one you used? Try both.</p>
+            </li>
+            <li>
+              <h4>Save your bank account <span class="guide-opt">only if you'll receive money</span></h4>
+              <p>You only need this when a group will pay out <em>to you</em>, for example if you collect rent from housemates and then pay the landlord yourself. Open your name at the top right, choose <b>Profile &amp; bank</b>, pick your bank, type your 10-digit account number and the name on the account, then press <b>Save account</b>.</p>
+              <p class="guide-tip">{% icon "lock" 16 %} <span>Your account number is encrypted. The app only ever shows the last four digits.</span></p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 2. START A GROUP ───── #}
+        <section id="g-create" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">2</span> Start a group <span class="guide-opt">for the person organising</span></h3>
+          <p class="mb-6 max-w-2xl text-body text-muted">The person who creates the group becomes its <b class="font-medium text-fg">admin</b>. Do this once; everyone else just pays.</p>
+
+          <ol class="guide-steps">
+            <li>
+              <h4>Press <b>New group</b></h4>
+              <p>You'll find it on your dashboard. Then pick what the money is for: <b>Rent</b>, <b>Electricity (NEPA)</b>, <b>Subscription</b>, <b>Family upkeep</b> or <b>Custom</b>. It only changes the icon and some sensible defaults.</p>
+            </li>
+            <li>
+              <h4>Fill in the details</h4>
+              <ul class="guide-list">
+                <li><b>Group name.</b> Something your friends will recognise, like "Flat 4B light bill".</li>
+                <li><b>Target amount.</b> The total everyone must raise together, in naira. Example: 30,000.</li>
+                <li><b>Due date.</b> When the money is needed. People are reminded as it nears.</li>
+              </ul>
+              <p class="guide-tip">{% icon "info" 16 %} <span><b>Fee tip.</b> A small service fee (₦150 unless set otherwise) is taken from the pool when it's paid out, and the summary on the right shows it. If a bill must be covered <em>exactly</em>, set the target a little higher.</span></p>
+            </li>
+            <li>
+              <h4>Choose if it repeats <span class="guide-opt">optional</span></h4>
+              <p>Tick <b>Repeat this group</b> and choose monthly, quarterly or yearly. When one round is paid out, the next opens by itself with the same people and the same split, so you never recreate it.</p>
+            </li>
+            <li>
+              <h4>Say where the money goes</h4>
+              <p>Pick one:</p>
+              <ul class="guide-list">
+                <li><b>Bank transfer.</b> Choose the bank, type the 10-digit account number and the account name. Use this for rent, or money for a family member.</li>
+                <li><b>Pay an electricity bill.</b> Choose your electricity company, whether the meter is <b>Prepaid</b> or <b>Postpaid</b>, and type the meter number. Press <b>Check this meter</b>: if it's correct you'll see the customer's name in green before you go on.</li>
+              </ul>
+            </li>
+            <li>
+              <h4>Decide about early payout</h4>
+              <p>The box <b>Allow me to pay out before the target is reached</b> lets you (only you) send what's been collected so far, for when the bill is due before everyone has paid. Leave it off if you'd rather wait for the full amount.</p>
+            </li>
+            <li>
+              <h4>Add the people</h4>
+              <p>Under <b>Who's in?</b> type each person's email or phone number. <b>They must already have a SplitStay account</b>, so ask them to register first. Leave <b>Equal share</b> empty to split fairly, or type an exact amount for someone who should pay more or less. Watch the <b>Summary</b> on the right: it shows what each person owes as you type.</p>
+              <p>Finally press <b>Create group</b>. Everyone you added gets an invitation.</p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 3. JOIN ───── #}
+        <section id="g-join" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">3</span> Join a group <span class="guide-opt">when you've been invited</span></h3>
+          <ol class="guide-steps">
+            <li>
+              <h4>Find your invitation</h4>
+              <p>Sign in. At the top of your dashboard there's an <b>Invitations</b> box, and a number appears on the bell. Each invitation shows who invited you, your share and the due date.</p>
+            </li>
+            <li>
+              <h4>Press <b>Join</b> (or <b>Decline</b>)</h4>
+              <p>You can't pay or see who has paid until you join, which keeps things private until you agree. If the share looks wrong, decline and ask the organiser to fix it, or join and ask them to change it before anyone pays.</p>
+              <p class="guide-tip">{% icon "info" 16 %} <span>You can leave a group any time <em>before</em> you've paid. After that, your payment is part of the group's money.</span></p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 4. PAY ───── #}
+        <section id="g-pay" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">4</span> Pay your share</h3>
+          <ol class="guide-steps">
+            <li>
+              <h4>Open the group and find <b>Your part</b></h4>
+              <p>It shows your share, what you've paid and what's <b>Outstanding</b>. You can only pay your own share. Nobody can pay for you, and you can't overpay.</p>
+            </li>
+            <li>
+              <h4>Press <b>Pay ₦…</b></h4>
+              <p>You're taken to the secure payment page of the payment company (Paystack). Pay with your card, a bank transfer or a USSD code, whichever you prefer. Don't close the page until it sends you back.</p>
+            </li>
+            <li>
+              <h4>Wait for the green tick</h4>
+              <p>You come back to SplitStay and see a tick draw itself with <b>Payment confirmed</b>, the amount, a reference number and the time. Keep the reference if you ever need to ask about it.</p>
+              <ul class="guide-list">
+                <li><b>"Confirming your payment…"</b> means the bank is still answering. Leave the page open or come back later; it completes by itself and you'll get a notification.</li>
+                <li><b>"Payment didn't go through"</b> means nothing was taken, and you can press Pay again.</li>
+              </ul>
+              <p class="guide-tip">{% icon "shield-check" 16 %} <span>If you press Pay twice by accident, you won't be charged twice for the same payment.</span></p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 5. WATCH ───── #}
+        <section id="g-watch" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">5</span> Watch it fill</h3>
+          <ol class="guide-steps">
+            <li>
+              <h4>Read the group page</h4>
+              <ul class="guide-list">
+                <li><b>The pot</b> rises as money comes in, with the amount collected, what's still needed and how many people have paid.</li>
+                <li><b>Who has paid</b> lists every member as <b>Paid</b>, <b>Part-paid</b> or <b>Not yet paid</b>. Everyone in the group can see this. That openness is the point.</li>
+                <li><b>Ledger</b> is the record of every payment, fee and payout, newest first. Press <b>Full history</b> for all of it.</li>
+              </ul>
+              <p>The page refreshes itself every few seconds, so you don't need to reload it.</p>
+            </li>
+            <li>
+              <h4>Use the bell and the Activity page</h4>
+              <p>The bell (top right) tells you when someone pays, when the target is reached, when the money is paid out, and when a payment is due soon. <b>Activity</b> in the menu shows them all. Click one to jump to the group.</p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 6. PAYOUT ───── #}
+        <section id="g-payout" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">6</span> The payout and the receipt</h3>
+          <ol class="guide-steps">
+            <li>
+              <h4>It happens by itself</h4>
+              <p>The moment the pot reaches the target, the group is marked <b>Funded</b> and the payment starts. For a <b>bank transfer</b>, the money is sent to the account you set. For an <b>electricity bill</b>, SplitStay buys the units for your meter. Nobody has to press anything.</p>
+            </li>
+            <li>
+              <h4>Open the receipt</h4>
+              <p>When it completes, <b>Your part</b> shows <b>View receipt</b>. The receipt lists who paid, the total, the service fee on its own line, and the amount actually paid. For electricity it also shows your <b>token</b>: the number you type into your meter. Press <b>Copy token</b> to copy it, or <b>Print or save as PDF</b> to keep it.</p>
+            </li>
+            <li>
+              <h4>If a payment fails</h4>
+              <p>Sometimes a bank or electricity company says no (for example, a wrong meter number). Your money is safe in the pot. The admin sees <b>Retry payment</b>; after fixing the problem with <b>Edit</b>, pressing it tries again with a fresh attempt. It never pays twice.</p>
+            </li>
+            <li>
+              <h4>Paying out early <span class="guide-opt">admin, if you allowed it</span></h4>
+              <p>If the bill is due before everyone has paid, press <b>Pay out ₦… now</b> and confirm. The group closes and the service fee is taken from what's collected. Late payers can't add more after that.</p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 7. MANAGE ───── #}
+        <section id="g-manage" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">7</span> Managing a group <span class="guide-opt">admin</span></h3>
+          <ol class="guide-steps">
+            <li>
+              <h4>Add, remove or re-split</h4>
+              <p>Use <b>Add member</b>, the <b>pencil</b> beside a name to set an exact share (clear it to go back to equal), or the <b>×</b> to remove someone. Everyone else's share rebalances so the total always equals the target.</p>
+              <p class="guide-tip">{% icon "lock" 16 %} <span><b>Why can't I change things?</b> Once the first payment arrives, members, shares and the target are locked. Otherwise someone could end up having paid more or less than they owe.</span></p>
+            </li>
+            <li>
+              <h4>Edit or cancel</h4>
+              <p><b>Edit</b> changes the name, due date and destination. <b>Cancel group</b> is only available while nobody has paid, because there are no refunds in this version.</p>
+            </li>
+            <li>
+              <h4>Repeating groups</h4>
+              <p>A repeating group opens its next round on its own after payout or the due date. The new round keeps the same people and shares, and everyone gets a notification. The date stays on the same day of the month.</p>
+            </li>
+          </ol>
+        </section>
+
+        {# ───── 8. WORDS ───── #}
+        <section id="g-words" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">8</span> Words explained</h3>
+          <dl class="mt-2 grid gap-x-10 gap-y-5 sm:grid-cols-2">
+            <div><dt class="text-body font-semibold text-fg">Pot</dt><dd class="text-body text-muted">All the money collected so far for one group.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Target</dt><dd class="text-body text-muted">The amount the pot must reach before it's paid out.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Share</dt><dd class="text-body text-muted">Your part of the target. Equal unless the admin set it differently.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Admin</dt><dd class="text-body text-muted">The person who created the group and manages it.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Ledger</dt><dd class="text-body text-muted">The permanent list of every payment, fee and payout in a group.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Payout</dt><dd class="text-body text-muted">The moment the pot is sent on: to a bank account or to a bill.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Service fee</dt><dd class="text-body text-muted">A small, flat charge for SplitStay, shown as its own line.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Token</dt><dd class="text-body text-muted">The number for a prepaid meter. Typing it in loads the units.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Cycle</dt><dd class="text-body text-muted">One round of a repeating group, such as one month's rent.</dd></div>
+            <div><dt class="text-body font-semibold text-fg">Reference</dt><dd class="text-body text-muted">A unique code for a payment, useful if you ever need to ask about one.</dd></div>
+          </dl>
+        </section>
+
+        {# ───── 9. FAQ ───── #}
+        <section id="g-faq" class="g-part scroll-mt-24">
+          <h3 class="guide-h"><span class="guide-n">9</span> Questions people ask</h3>
+          <div class="mt-4 divide-line rounded-xl border border-line bg-surface">
+            <details class="faq group p-5"><summary>Is my money safe?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Every payment is recorded before anything else happens, and a payment is only counted once, even if the payment company tells us twice. Money moves only to the account or meter the group was created with, and the admin cannot change the destination after the first payment.</p></details>
+            <details class="faq group p-5"><summary>Someone hasn't paid. What now?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>The group stays open past its due date (it shows as <b>Overdue</b>) and still accepts payments. Late payers are reminded. If the bill can't wait, the admin can pay out early, if that was allowed when the group was created.</p></details>
+            <details class="faq group p-5"><summary>I paid but it says Pending.<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Banks sometimes take a minute. Leave the confirmation page open; it checks every few seconds. If it stays pending for a long time, tell the admin your payment reference, which you can find in the confirmation page.</p></details>
+            <details class="faq group p-5"><summary>Can I get a refund?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Not in this version. That's why a group that has received money can't simply be cancelled; it's paid out instead. Check the amount and destination before you pay.</p></details>
+            <details class="faq group p-5"><summary>Does SplitStay lend money?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Never. Nothing is paid on your behalf in advance. Bills and transfers are paid only from money your group has already put in.</p></details>
+            <details class="faq group p-5"><summary>What does it cost?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Creating and joining groups is free. A small service fee is taken from the pot when it's paid out, shown beforehand in the group summary and afterwards as its own line on the ledger and receipt.</p></details>
+            <details class="faq group p-5"><summary>Can I use my phone?<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Yes. The site works in any phone browser, and there's a light and a dark mode (the sun or moon button at the top right).</p></details>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</section>

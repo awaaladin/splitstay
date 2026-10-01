@@ -1,6 +1,6 @@
 {% load cp l10n %}
 <section id="pot" class="card card-pad" data-percent="{{ percent_value|unlocalize }}"{% if oob %} hx-swap-oob="true"{% endif %} aria-label="Group funding progress">
-  <div class="flex items-center gap-6 sm:gap-9">
+  <div class="flex items-center gap-4 sm:gap-9">
 
     {# The pot: liquid rises with a springy overshoot; the surface drifts continuously. Updated live via htmx. #}
     <div class="pot" role="img" aria-label="{{ progress.percent }} percent funded">
@@ -22,10 +22,10 @@
 
     <div class="min-w-0 flex-1">
       <p class="eyebrow">Funded so far</p>
-      <p id="pot-funded" class="amount text-figure text-fg" data-count-to="{{ progress.funded|unlocalize }}" data-count-key="funded">{{ progress.funded|naira }}</p>
+      <p id="pot-funded" class="amount text-[1.5rem] leading-8 text-fg sm:text-figure" data-count-to="{{ progress.funded|unlocalize }}" data-count-key="funded">{{ progress.funded|naira }}</p>
       <p class="meta mt-0.5">of <span class="tnum font-medium text-fg">{{ progress.target|naira }}</span> target · <span class="tnum">{{ progress.percent }}%</span></p>
 
-      <dl class="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4">
+      <dl class="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-line pt-4 min-[400px]:grid-cols-2 sm:mt-5">
         <div>
           <dt class="eyebrow">Still to collect</dt>
           <dd class="amount mt-0.5 text-body text-fg">{{ progress.remaining|naira }}</dd>
