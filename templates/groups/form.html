@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}{% if editing %}Edit {{ editing.name }}{% else %}New group{% endif %} · SplitStay{% endblock %}
+
+{% block content %}
+{{ member_rows|json_script:"gf-members" }}
+<div class="page" x-data="groupForm({
+    purpose: '{{ form.purpose.value|default:'rent' }}',
+    payoutType: '{{ form.payout_type.value|default:'bank_transfer' }}',
+    recurring: {{ form.is_recurring.value|yesno:'true,false' }},
+    target: '{{ form.target_amount.value|default_if_none:'' }}',
+    members: JSON.parse(document.getElementById('gf-members').textContent),
+    editing: {{ editing|yesno:'true,false' }},
+    fee: { type: '{{ fee.type }}', flat: {{ fee.flat }}, percent: {{ fee.percent }} }
+  })">
+
+  <a href="{% if editing %}{% url 'web:group_detail' editing.pk %}{% else %}{% url 'web:dashboard' %}{% endif %}" class="btn-quiet btn-sm -ml-3 mb-4 inline-flex">{% icon "arrow-left" 16 %} Back</a>
+  <h1 class="page-title">{% if editing %}Edit group{% else %}Start a group{% endif %}</h1>
+  <p class="mt-1 max-w-2xl text-body text-muted">
+    {% if editing %}Some things are locked once money is involved: the payout type, and (after the first payment) the target and members.
+    {% else %}Set a target and who is in. When the target is reached, SplitStay pays the bill or the recipient directly.{% endif %}
+  </p>
+
+  <form method="post" class="mt-8 grid gap-6 lg:grid-cols-3" data-busy novalidate>
+    {% csrf_token %}
+    <div class="space-y-6 lg:col-span-2">
+
+      {% if form.non_field_errors %}<div class="alert-danger">{% icon "alert" 20 "mt-0.5" %}<div>{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div></div>{% endif %}
+
+      {# 1. Purpose #}
+      <section class="card card-pad">
+        <h2 class="section-title">What is it for?</h2>
+        <fieldset class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <legend class="sr-only">Purpose</legend>
+          {% for value, label in form.purpose.field.choices %}
+          <label class="relative cursor-pointer">
+            <input type="radio" name="purpose" value="{{ value }}" class="peer sr-only" x-model="purpose" @change="setPurpose('{{ value }}')" {% if form.purpose.value == value %}checked{% endif %}>
+            <span class="flex h-full flex-col items-start gap-2 rounded-lg border border-line-strong bg-surface p-3 text-body transition-colors peer-checked:border-primary peer-checked:bg-primary-soft peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-primary hover:bg-sunken">
+              <span class="text-primary">{% purpose_icon value 22 %}</span>
+              <span class="text-meta font-medium leading-tight">{{ label }}</span>
+            </span>
+          </label>
+          {% endfor %}
+        </fieldset>
+      </section>
+
+      {# 2. Details #}
+      <section class="card card-pad space-y-5">
+        <h2 class="section-title">The details</h2>
+        {% include "partials/field.html" with field=form.name %}
+        {% include "partials/field.html" with field=form.description %}
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label class="label" for="{{ form.target_amount.id_for_label }}">{{ form.target_amount.label }}</label>
+            <input type="text" inputmode="decimal" name="target_amount" id="{{ form.target_amount.id_for_label }}" class="input tnum" x-model="target" placeholder="90000" required>
+            {% for error in form.target_amount.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            <p class="hint">The total the group needs to collect.</p>
+          </div>
+          {% include "partials/field.html" with field=form.due_date %}
+        </div>
+
+        <div class="border-t border-line pt-5">
+          <label class="flex items-start gap-3 text-body">
+            <input type="checkbox" name="is_recurring" class="mt-1 h-4 w-4 rounded border-line-strong accent-[rgb(var(--primary))]" x-model="recurring" {% if form.is_recurring.value %}checked{% endif %}>
+            <span>Repeat this group<span class="hint block">A new cycle opens automatically with the same members and split, once this one is paid out or its due date passes.</span></span>
+          </label>
+          <div class="mt-4 max-w-xs" x-show="recurring" x-cloak x-transition.opacity.duration.150ms>
+            {% include "partials/field.html" with field=form.recurrence_interval %}
+          </div>
+        </div>
+      </section>
+
+      {# 3. Destination #}
+      <section class="card card-pad space-y-5">
+        <h2 class="section-title">Where should the money go?</h2>
+
+        {% if editing %}
+          <input type="hidden" name="payout_type" value="{{ editing.payout_type }}">
+          <p class="alert-info text-meta">{% icon "lock" 18 "mt-0.5" %} <span>This group pays by <strong>{{ editing.get_payout_type_display|lower }}</strong>. The type can't change after creation.</span></p>
+        {% else %}
+        <fieldset class="grid gap-3 sm:grid-cols-2">
+          <legend class="sr-only">Payout type</legend>
+          <label class="cursor-pointer">
+            <input type="radio" name="payout_type" value="bank_transfer" class="peer sr-only" x-model="payoutType">
+            <span class="flex items-start gap-3 rounded-lg border border-line-strong p-4 transition-colors peer-checked:border-primary peer-checked:bg-primary-soft peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-primary hover:bg-sunken">
+              <span class="text-primary">{% icon "landmark" 22 %}</span>
+              <span><span class="block text-body font-medium">Bank transfer</span><span class="hint mt-0.5 block">Rent to a landlord, or money to a family member's account.</span></span>
+            </span>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="payout_type" value="bill_payment" class="peer sr-only" x-model="payoutType">
+            <span class="flex items-start gap-3 rounded-lg border border-line-strong p-4 transition-colors peer-checked:border-primary peer-checked:bg-primary-soft peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-primary hover:bg-sunken">
+              <span class="text-primary">{% icon "zap" 22 %}</span>
+              <span><span class="block text-body font-medium">Pay an electricity bill</span><span class="hint mt-0.5 block">We buy the units for your meter and give you the token.</span></span>
+            </span>
+          </label>
+        </fieldset>
+        {% endif %}
+
+        <div x-show="payoutType === 'bank_transfer'" x-cloak class="space-y-5">
+          <div class="grid gap-5 sm:grid-cols-2">
+            {% include "partials/field.html" with field=form.recipient_bank_code %}
+            {% include "partials/field.html" with field=form.recipient_account_number %}
+          </div>
+          {% include "partials/field.html" with field=form.recipient_account_name %}
+          {% if editing and editing.recipient_account_number %}<p class="meta">Saved account: {{ editing.recipient_bank_name }} · {{ editing.masked_recipient_account }}</p>{% endif %}
+        </div>
+
+        <div x-show="payoutType === 'bill_payment'" x-cloak class="space-y-5">
+          <div class="grid gap-5 sm:grid-cols-2">
+            {% include "partials/field.html" with field=form.bill_service_id %}
+            {% include "partials/field.html" with field=form.bill_variation %}
+          </div>
+          <div>
+            {% include "partials/field.html" with field=form.bill_customer_id %}
+            <div class="mt-3 flex items-start gap-3">
+              <button type="button" class="btn-secondary btn-sm" hx-post="{% url 'web:validate_meter' %}" hx-include="[name='bill_service_id'],[name='bill_customer_id'],[name='bill_variation']" hx-target="#meter-result" hx-swap="innerHTML" data-quiet>{% icon "shield-check" 16 %} Check this meter</button>
+              <div id="meter-result" class="min-h-[2rem] text-body" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-line pt-5">
+          <label class="flex items-start gap-3 text-body">
+            <input type="checkbox" name="allow_partial_payout" class="mt-1 h-4 w-4 rounded border-line-strong accent-[rgb(var(--primary))]" {% if form.allow_partial_payout.value %}checked{% endif %}>
+            <span>{{ form.allow_partial_payout.label }}<span class="hint block">Useful when the bill is due before everyone has paid. Only you (the admin) can trigger it.</span></span>
+          </label>
+        </div>
+      </section>
+
+      {# 4. Members #}
+      {% if not editing %}
+      <section class="card card-pad">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="section-title">Who's in?</h2>
+            <p class="mt-1 text-body text-muted">You're included automatically. Invite others by the email or phone number on their SplitStay account. Shares are equal unless you set an amount.</p>
+          </div>
+        </div>
+        <div class="mt-5 space-y-3">
+          <div class="flex items-center gap-3 rounded-md bg-sunken px-3 py-2.5">
+            <span class="grid h-8 w-8 place-items-center rounded-full bg-primary text-meta font-semibold text-on-primary">{{ user.initials }}</span>
+            <p class="flex-1 text-body font-medium">{{ user.display_name }} <span class="text-meta font-normal text-muted">(you, admin)</span></p>
+            <p class="amount text-body" x-text="money(equalShare)"></p>
+          </div>
+          <template x-for="(m, i) in members" :key="i">
+            <div class="grid grid-cols-[1fr_auto] gap-2 sm:grid-cols-[1fr_11rem_auto]">
+              <input type="text" name="member_identifier" class="input" placeholder="Email or phone number" x-model="m.identifier" autocomplete="off">
+              <input type="text" name="member_share" inputmode="decimal" class="input tnum order-3 col-span-2 sm:order-none sm:col-span-1" placeholder="Equal share" x-model="m.share" :aria-label="'Custom share for member ' + (i + 1)">
+              <button type="button" class="btn-quiet !p-2" @click="removeMember(i)" aria-label="Remove row">{% icon "x" 18 %}</button>
+            </div>
+          </template>
+        </div>
+        <button type="button" class="btn-secondary btn-sm mt-4" @click="addMember()">{% icon "plus" 16 %} Add another person</button>
+      </section>
+      {% endif %}
+
+      <div class="flex items-center justify-end gap-3">
+        <a href="{% if editing %}{% url 'web:group_detail' editing.pk %}{% else %}{% url 'web:dashboard' %}{% endif %}" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn-primary">{% if editing %}Save changes{% else %}Create group{% endif %}</button>
+      </div>
+    </div>
+
+    {# Live summary: what each person owes and what actually arrives after the fee #}
+    <aside class="lg:sticky lg:top-24 lg:h-fit">
+      <section class="card card-pad">
+        <h2 class="section-title">Summary</h2>
+        <dl class="mt-4 space-y-3 text-body">
+          <div class="flex items-baseline justify-between"><dt class="meta">Target</dt><dd class="amount" x-text="money(targetNumber)"></dd></div>
+          {% if not editing %}
+          <div class="flex items-baseline justify-between"><dt class="meta">People</dt><dd class="amount" x-text="headcount"></dd></div>
+          <div class="flex items-baseline justify-between"><dt class="meta">Equal share</dt><dd class="amount" x-text="money(equalShare)"></dd></div>
+          {% endif %}
+          <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="meta">Service fee at payout</dt><dd class="amount text-muted" x-text="money(feeAmount)"></dd></div>
+          <div class="flex items-baseline justify-between"><dt class="meta font-medium text-fg" x-text="payoutType === 'bill_payment' ? 'Paid to the biller' : 'Sent to the recipient'"></dt><dd class="amount text-lead" x-text="money(Math.max(targetNumber - feeAmount, 0))"></dd></div>
+        </dl>
+        <p class="hint mt-4">The fee comes out of the pooled amount, so set the target a little higher if the bill must be covered in full.</p>
+        <p class="mt-3 text-meta text-warn" x-show="customTotal > targetNumber && targetNumber > 0" x-cloak>Custom shares add up to more than the target.</p>
+      </section>
+    </aside>
+  </form>
+</div>
+{% endblock %}

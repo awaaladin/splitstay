@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Receipt · {{ group.name }} · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="no-print mx-auto mb-6 flex max-w-lg items-center justify-between">
+    <a href="{% url 'web:group_detail' group.pk %}" class="btn-quiet btn-sm -ml-3">{% icon "arrow-left" 16 %} {{ group.name }}</a>
+    {% if record.status == 'completed' %}<button type="button" class="btn-secondary btn-sm" onclick="window.print()">{% icon "printer" 16 %} Print or save as PDF</button>{% endif %}
+  </div>
+  {% include "groups/_receipt_body.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+<span id="bell-badge"{% if oob %} hx-swap-oob="true"{% endif %} class="absolute -right-0.5 -top-0.5 {% if not unread_count %}hidden{% endif %}">
+  <span class="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-primary px-1 text-[0.6875rem] font-semibold leading-none text-on-primary tnum">{{ unread_count }}</span>
+</span>

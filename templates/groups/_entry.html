@@ -1,0 +1,30 @@
+{% load cp %}
+{# One ledger row. data-entry lets the client detect which rows just arrived. #}
+<li class="flex items-start gap-3 px-5 py-3.5 sm:px-6" data-entry="{{ e.kind }}:{{ e.reference }}:{{ e.status }}">
+  <span class="mt-0.5 grid h-8 w-8 flex-none place-items-center rounded-full
+    {% if e.kind == 'contribution' and e.status == 'paid' %}bg-ok-soft text-ok
+    {% elif e.status == 'failed' %}bg-danger-soft text-danger
+    {% elif e.kind == 'fee' %}bg-sunken text-muted
+    {% else %}bg-primary-soft text-primary{% endif %}">
+    {% if e.kind == 'contribution' %}{% icon "plus" 16 %}
+    {% elif e.kind == 'fee' %}{% icon "receipt" 16 %}
+    {% elif e.kind == 'bill_payment' %}{% icon "zap" 16 %}
+    {% else %}{% icon "landmark" 16 %}{% endif %}
+  </span>
+  <div class="min-w-0 flex-1">
+    <p class="text-body font-medium">{{ e.title }}{% if e.kind == 'contribution' %} <span class="font-normal text-muted">by {{ e.actor }}</span>{% endif %}</p>
+    <p class="meta tnum">{{ e.at|date:"j M Y, g:i a" }}
+      {% if e.kind == 'fee' %} · {% if e.detail.fee_type == 'percent' %}{{ e.detail.rate }}% of the pool{% else %}flat fee{% endif %}, deducted before payment{% endif %}
+      {% if e.detail.token %} · token <span class="receipt-mono text-fg">{{ e.detail.token }}</span>{% endif %}
+      {% if e.detail.account %} · {{ e.detail.account }}{% endif %}
+    </p>
+    {% if e.detail.needs_review %}<p class="mt-1 text-meta text-warn">Flagged for admin review.</p>{% endif %}
+  </div>
+  <div class="flex-none text-right">
+    <p class="amount text-body {% if e.kind == 'fee' or e.kind == 'payout' or e.kind == 'bill_payment' %}text-muted{% else %}text-fg{% endif %}">
+      {% if e.kind == 'contribution' and e.status == 'paid' %}+{% elif e.kind != 'contribution' %}−{% endif %}{{ e.amount|naira }}
+    </p>
+    {% if e.kind == 'payout' or e.kind == 'bill_payment' %}<span class="mt-0.5 inline-block">{% status_badge "payout" e.status %}</span>
+    {% elif e.status == 'failed' %}<span class="mt-0.5 inline-block">{% status_badge "contribution" "failed" %}</span>{% endif %}
+  </div>
+</li>

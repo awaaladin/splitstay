@@ -1,0 +1,11 @@
+{% load cp %}
+<div id="header-actions" class="flex flex-none flex-wrap gap-2"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if is_admin %}
+    {% if can_manage_members %}<button type="button" class="btn-secondary btn-sm" @click="invite = true">{% icon "plus" 16 %} Add member</button>{% endif %}
+    {% if can_edit %}<a href="{% url 'web:group_edit' group.pk %}" class="btn-secondary btn-sm">{% icon "pencil" 16 %} Edit</a>{% endif %}
+    {% if can_cancel %}
+      <button type="button" class="btn-danger btn-sm"
+        @click="$dispatch('confirm', { action: '{% url 'web:group_cancel' group.pk %}', title: 'Cancel this group?', body: 'Nobody has paid in yet, so nothing needs refunding. The group closes and any recurring schedule stops.', confirmLabel: 'Cancel group', danger: true })">Cancel group</button>
+    {% endif %}
+  {% endif %}
+</div>

@@ -1,0 +1,66 @@
+x-app: &app
+  build: .
+  image: splitstay-app
+  volumes:
+    - .:/app
+  environment: &env
+    DJANGO_SETTINGS_MODULE: config.settings.dev
+    DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-key-do-not-use-in-production}
+    DATABASE_URL: postgres://splitstay:splitstay@db:5432/splitstay
+    REDIS_URL: redis://redis:6379/0
+    SITE_URL: ${SITE_URL:-http://localhost:8000}
+    CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-mock}
+    PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY:-}
+    BILL_PROVIDER: ${BILL_PROVIDER:-mock}
+    VTPASS_API_KEY: ${VTPASS_API_KEY:-}
+    VTPASS_SECRET_KEY: ${VTPASS_SECRET_KEY:-}
+    FIELD_ENCRYPTION_KEY: ${FIELD_ENCRYPTION_KEY:-}
+    SERVICE_FEE_TYPE: ${SERVICE_FEE_TYPE:-flat}
+    SERVICE_FEE_FLAT: ${SERVICE_FEE_FLAT:-150}
+    SERVICE_FEE_PERCENT: ${SERVICE_FEE_PERCENT:-1.5}
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: splitstay
+      POSTGRES_USER: splitstay
+      POSTGRES_PASSWORD: splitstay
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U splitstay -d splitstay"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  web:
+    <<: *app
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *app
+    command: celery -A config worker -l info
+
+  beat:
+    <<: *app
+    command: celery -A config beat -l info
+
+volumes:
+  pgdata:

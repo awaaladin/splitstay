@@ -1,0 +1,16 @@
+{% load cp %}
+<section id="ledger" class="card"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="flex items-center justify-between px-5 pt-5 sm:px-6">
+    <div>
+      <h2 class="section-title">Ledger</h2>
+      <p class="meta mt-0.5">Every contribution, fee and payout, newest first.</p>
+    </div>
+    <a class="btn-quiet btn-sm" href="{% url 'web:group_ledger' group.pk %}">Full history {% icon "arrow-right" 16 %}</a>
+  </div>
+  <ul class="mt-4 divide-line">
+    {% for e in entries %}{% include "groups/_entry.html" %}
+    {% empty %}
+      <li class="px-5 py-10 text-center sm:px-6"><p class="text-body text-muted">Nothing has been paid in yet. Contributions appear here the moment they're confirmed.</p></li>
+    {% endfor %}
+  </ul>
+</section>

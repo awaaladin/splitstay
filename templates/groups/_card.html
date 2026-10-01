@@ -1,0 +1,17 @@
+{% load cp %}
+<a href="{% url 'web:group_detail' c.group.pk %}" class="card group block p-5 transition-shadow duration-150 hover:shadow-raised">
+  <div class="flex items-start justify-between gap-3">
+    <span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary-soft text-primary">{% purpose_icon c.group.purpose 20 %}</span>
+    {% status_badge "group" c.group.status %}
+  </div>
+  <h3 class="mt-4 truncate text-body font-semibold text-fg">{{ c.group.name }}</h3>
+  <p class="meta mt-0.5">{{ c.group.get_purpose_display }}{% if c.group.is_recurring %} · {{ c.group.get_recurrence_interval_display|lower }}{% endif %} · due {{ c.group.due_date|date:"j M" }}</p>
+  <div class="bar mt-4"><i data-fill="{{ c.percent }}"></i></div>
+  <div class="mt-2 flex items-baseline justify-between">
+    <p class="amount text-body text-fg">{{ c.funded|naira_short }}</p>
+    <p class="meta tnum">of {{ c.group.target_amount|naira_short }}</p>
+  </div>
+  {% if c.my_outstanding and c.group.is_open_for_contributions %}
+    <p class="mt-3 border-t border-line pt-3 text-meta text-muted">You owe <span class="amount text-fg">{{ c.my_outstanding|naira_short }}</span></p>
+  {% endif %}
+</a>

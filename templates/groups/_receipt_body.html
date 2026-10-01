@@ -1,0 +1,101 @@
+{% load cp %}
+<div id="receipt-root" class="mx-auto max-w-lg"
+  {% if record.status == 'pending' or record.status == 'processing' %}hx-get="{% url 'web:group_receipt' group.pk %}" hx-trigger="every 4s" hx-target="this" hx-swap="outerHTML" data-quiet{% endif %}>
+
+{% if record.status == 'completed' %}
+  <div class="receipt-wrap">
+    <article class="receipt px-6 pt-8 sm:px-8" aria-label="Payment receipt">
+
+      <header class="receipt-line flex items-start justify-between" style="--i:0">
+        <div class="flex items-center gap-2.5 text-primary">
+          {% logo_mark "rcpt" 28 %}
+          <span class="text-lead font-semibold tracking-tight text-fg">Contrib<span class="text-primary">Pay</span></span>
+        </div>
+        <div class="text-right">
+          <p class="eyebrow">{% if is_bill %}Bill payment{% else %}Bank transfer{% endif %} receipt</p>
+          <p class="receipt-mono mt-0.5 text-meta text-muted">{{ record.reference|truncatechars:22 }}</p>
+        </div>
+      </header>
+
+      <div class="receipt-line mt-7 flex items-center gap-4" style="--i:1">
+        <svg viewBox="0 0 64 64" class="h-16 w-16 flex-none text-ok" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <rect class="seal" pathLength="1" x="6" y="6" width="52" height="52" rx="14" stroke-width="2.5"/>
+          <path class="seal" pathLength="1" d="M20 33 28.5 41.5 44 24" stroke-width="3.5"/>
+        </svg>
+        <div>
+          <p class="seal-text text-section text-ok">Paid</p>
+          <p class="meta tnum">{{ record.completed_at|date:"l, j F Y" }} · {{ record.completed_at|date:"g:i a" }}</p>
+        </div>
+      </div>
+
+      <div class="receipt-rule mt-6"></div>
+
+      <dl class="mt-5 space-y-3 text-body">
+        <div class="receipt-line flex justify-between gap-6" style="--i:2"><dt class="meta">Group</dt><dd class="text-right font-medium">{{ group.name }}{% if group.is_recurring %} <span class="font-normal text-muted">· cycle {{ group.cycle_number }}</span>{% endif %}</dd></div>
+        {% if is_bill %}
+          <div class="receipt-line flex justify-between gap-6" style="--i:3"><dt class="meta">Paid to</dt><dd class="text-right font-medium">{{ record.biller_name }}</dd></div>
+          <div class="receipt-line flex justify-between gap-6" style="--i:4"><dt class="meta">Meter</dt><dd class="receipt-mono text-right">{{ record.customer_id }} <span class="font-sans text-muted">({{ record.variation|default:"prepaid" }})</span></dd></div>
+          {% if record.customer_name %}<div class="receipt-line flex justify-between gap-6" style="--i:5"><dt class="meta">Customer</dt><dd class="text-right">{{ record.customer_name }}</dd></div>{% endif %}
+        {% else %}
+          <div class="receipt-line flex justify-between gap-6" style="--i:3"><dt class="meta">Paid to</dt><dd class="text-right font-medium">{{ record.recipient_account_name }}</dd></div>
+          <div class="receipt-line flex justify-between gap-6" style="--i:4"><dt class="meta">Account</dt><dd class="text-right tnum">{{ record.recipient_bank_name }} · {{ record.masked_account }}</dd></div>
+        {% endif %}
+        <div class="receipt-line flex justify-between gap-6" style="--i:6"><dt class="meta">Reference</dt><dd class="receipt-mono break-all text-right text-meta">{{ record.reference }}</dd></div>
+        {% if is_bill and record.provider_reference %}<div class="receipt-line flex justify-between gap-6" style="--i:7"><dt class="meta">Biller reference</dt><dd class="receipt-mono text-right text-meta">{{ record.provider_reference }}</dd></div>{% endif %}
+      </dl>
+
+      {% if is_bill and record.token %}
+      <div class="receipt-line mt-6 rounded-md border border-dashed border-line-strong bg-sunken px-4 py-4 text-center" style="--i:8" x-data="{ copied: false }">
+        <p class="eyebrow">Electricity token{% if record.units %} · {{ record.units }}{% endif %}</p>
+        <p class="receipt-mono mt-2 text-section tracking-widest text-fg">{{ record.token }}</p>
+        <button type="button" class="no-print mt-2 text-meta font-medium text-primary hover:underline"
+          @click="navigator.clipboard.writeText('{{ record.token }}'); copied = true; setTimeout(() => copied = false, 1800)"><span x-show="!copied">Copy token</span><span x-show="copied" x-cloak>Copied</span></button>
+      </div>
+      {% endif %}
+
+      <div class="receipt-rule mt-6"></div>
+
+      <div class="receipt-line mt-5" style="--i:9">
+        <p class="eyebrow">Contributions ({{ contributions|length }})</p>
+        <ul class="mt-3 space-y-1.5">
+          {% for c in contributions %}
+          <li class="flex justify-between gap-4 text-meta"><span class="truncate">{{ c.member.display_name }} <span class="text-muted tnum">· {{ c.paid_at|date:"j M" }}</span></span><span class="amount text-fg">{{ c.amount|naira }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="receipt-rule mt-5"></div>
+
+      <dl class="receipt-line mt-5 space-y-2 text-body" style="--i:10">
+        <div class="flex justify-between"><dt class="meta">Total collected</dt><dd class="amount">{{ record.gross_amount|naira }}</dd></div>
+        {% for fee in fees %}
+        <div class="flex justify-between"><dt class="meta">{{ fee.description }}{% if fee.fee_type == 'percent' %} ({{ fee.rate|floatformat:"-2" }}%){% endif %}</dt><dd class="amount text-muted">−{{ fee.amount|naira }}</dd></div>
+        {% endfor %}
+        <div class="flex items-baseline justify-between border-t border-line-strong pt-3"><dt class="text-body font-semibold">Amount paid{% if is_bill %} to biller{% endif %}</dt><dd class="amount text-figure text-fg">{{ record.net_amount|naira }}</dd></div>
+      </dl>
+      {% if record.is_partial %}<p class="receipt-line mt-4 text-meta text-muted" style="--i:11">Paid out early at the admin's request, before the {{ group.target_amount|naira }} target was reached.</p>{% endif %}
+
+      <p class="receipt-line mt-7 text-center text-micro normal-case tracking-normal text-muted" style="--i:12">Issued by SplitStay. The full history of this group is in its ledger.</p>
+    </article>
+  </div>
+
+{% elif record.status == 'failed' %}
+  <div class="card card-pad text-center">
+    <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-danger-soft text-danger">{% icon "alert" 26 %}</span>
+    <h1 class="section-title mt-4">The payment didn't complete</h1>
+    <p class="mx-auto mt-2 max-w-sm text-body text-muted">{{ record.failure_reason|default:"The payment could not be completed." }} The pooled money is safe and no receipt has been issued.</p>
+    {% if is_admin %}
+    <form method="post" action="{% url 'web:group_payout' group.pk %}" class="mt-5" data-busy>{% csrf_token %}<button class="btn-primary">{% icon "refresh" 18 %} Retry payment</button></form>
+    {% else %}<p class="hint mt-3">The group admin can retry it from the group page.</p>{% endif %}
+  </div>
+
+{% else %}
+  <div class="card card-pad text-center">
+    <div class="loader-stack mark-loop py-6">
+      {% logo_mark "rcpt-wait" 64 %}
+      <h1 class="section-title">Making the payment…</h1>
+      <p class="meta max-w-xs">Your receipt will appear here as soon as {% if is_bill %}the biller confirms{% else %}the transfer is confirmed{% endif %}.</p>
+    </div>
+  </div>
+{% endif %}
+</div>

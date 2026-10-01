@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Activity · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="flex items-end justify-between gap-4">
+    <div><p class="eyebrow">Activity</p><h1 class="page-title mt-1">Notifications</h1></div>
+    <form method="post" action="{% url 'web:notifications_read_all' %}">{% csrf_token %}<button class="btn-secondary btn-sm">{% icon "check" 16 %} Mark all read</button></form>
+  </div>
+  <ul class="card mt-6 divide-line">
+    {% for n in page %}
+    <li><a href="{% url 'web:notification_open' n.pk %}" class="flex items-start gap-4 px-5 py-4 hover:bg-sunken">
+      <span class="mt-2 h-2 w-2 flex-none rounded-full {% if n.read_at %}bg-line-strong{% else %}bg-primary{% endif %}"></span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-body {% if not n.read_at %}font-semibold{% else %}font-medium{% endif %}">{{ n.title }}</span>
+        {% if n.body %}<span class="mt-0.5 block text-body text-muted">{{ n.body }}</span>{% endif %}
+        <span class="meta mt-1 block">{{ n.get_kind_display }}{% if n.group %} · {{ n.group.name }}{% endif %}</span>
+      </span>
+      <span class="meta flex-none tnum">{{ n.created_at|date:"j M, g:i a" }}</span>
+    </a></li>
+    {% empty %}
+    <li class="px-6 py-14 text-center"><p class="text-body text-muted">Nothing yet. You'll hear about contributions, reminders and payouts here.</p></li>
+    {% endfor %}
+  </ul>
+  {% if page.paginator.num_pages > 1 %}
+  <nav class="mt-4 flex items-center justify-between" aria-label="Pagination">
+    {% if page.has_previous %}<a class="btn-secondary btn-sm" href="?page={{ page.previous_page_number }}">Newer</a>{% else %}<span></span>{% endif %}
+    <span class="meta tnum">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a class="btn-secondary btn-sm" href="?page={{ page.next_page_number }}">Older</a>{% else %}<span></span>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

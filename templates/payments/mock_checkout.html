@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Sandbox checkout · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="mx-auto max-w-md pt-4 sm:pt-8">
+    <p class="alert-warn mb-5 text-meta">{% icon "info" 18 "mt-0.5" %} <span><strong class="font-semibold">Sandbox checkout.</strong> This stands in for the payment gateway's hosted page while <code>PAYMENT_GATEWAY=mock</code>. No real money moves.</span></p>
+    <div class="card card-pad">
+      <p class="eyebrow">Paying</p>
+      <p class="amount mt-1 text-figure text-fg">{{ contribution.amount|naira }}</p>
+      <p class="mt-1 text-body text-muted">{{ group.name }} · reference <span class="receipt-mono text-meta">{{ contribution.reference }}</span></p>
+      {% if contribution.status == 'pending' %}
+      <form method="post" class="mt-6 space-y-3" data-busy>
+        {% csrf_token %}
+        <button name="outcome" value="success" class="btn-primary btn-block">Simulate successful payment</button>
+        <button name="outcome" value="decline" class="btn-secondary btn-block">Simulate declined payment</button>
+      </form>
+      {% else %}
+        <p class="mt-6 text-body text-muted">This payment is already {{ contribution.get_status_display|lower }}.</p>
+        <a class="btn-primary mt-4" href="{% url 'web:contribution_confirmation' contribution.reference %}">Continue</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

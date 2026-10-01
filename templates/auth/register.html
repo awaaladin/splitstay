@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Create account · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="mx-auto max-w-md pt-4 sm:pt-10">
+    <h1 class="page-title">Create your account</h1>
+    <p class="mt-1 text-body text-muted">It takes a minute. Friends can then invite you to groups by email or phone.</p>
+
+    <form method="post" class="card card-pad mt-6 space-y-5" data-busy novalidate>
+      {% csrf_token %}
+      {% include "partials/field.html" with field=form.full_name %}
+      {% include "partials/field.html" with field=form.email %}
+      {% include "partials/field.html" with field=form.phone_number %}
+      {% include "partials/field.html" with field=form.password %}
+      <button type="submit" class="btn-primary btn-block">Create account</button>
+    </form>
+    <p class="mt-5 text-center text-body text-muted">Already registered? <a class="font-medium text-primary hover:underline" href="{% url 'web:login' %}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}

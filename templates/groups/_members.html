@@ -1,0 +1,38 @@
+{% load cp %}
+<section id="members" class="card"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="flex items-center justify-between px-5 pt-5 sm:px-6">
+    <div>
+      <h2 class="section-title">Who has paid</h2>
+      <p class="meta mt-0.5">Everyone in the group can see this.</p>
+    </div>
+    <span class="badge-neutral tnum">{{ rows|length }} member{{ rows|length|pluralize }}</span>
+  </div>
+  <ul class="mt-4 divide-line">
+    {% for r in rows %}
+      <li class="flex items-center gap-3 px-5 py-3.5 sm:px-6">
+        <span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">{{ r.user.initials }}</span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-body font-medium">{{ r.user.display_name }}
+            {% if r.is_admin %}<span class="ml-1 text-micro normal-case tracking-normal text-muted">Admin</span>{% endif %}
+            {% if r.user.pk == request.user.pk %}<span class="ml-1 text-micro normal-case tracking-normal text-muted">You</span>{% endif %}
+          </p>
+          <p class="meta tnum">
+            Share {{ r.share|naira }}{% if r.membership.is_custom_share %} <span class="text-muted">(set by admin)</span>{% endif %}
+            {% if r.paid and r.state != 'paid' %} · paid {{ r.paid|naira }}{% endif %}
+          </p>
+        </div>
+        <div class="flex flex-none items-center gap-2 text-right">
+          <span class="{% if r.state == 'paid' %}state-flip{% endif %}">{% status_badge "member" r.state %}</span>
+          {% if can_manage_members %}
+            <button type="button" class="btn-quiet !p-1.5" aria-label="Edit {{ r.user.display_name }}'s share"
+              @click="$dispatch('edit-share', { action: '{% url 'web:group_member_share' group.pk r.user.pk %}', name: '{{ r.user.display_name|escapejs }}', share: '{% if r.membership.is_custom_share %}{{ r.share }}{% endif %}' })">{% icon "pencil" 16 %}</button>
+            {% if not r.is_admin %}
+              <button type="button" class="btn-quiet !p-1.5" aria-label="Remove {{ r.user.display_name }}"
+                @click="$dispatch('confirm', { action: '{% url 'web:group_member_remove' group.pk r.user.pk %}', title: 'Remove {{ r.user.display_name|escapejs }}?', body: 'Their share is redistributed equally among the remaining members.', confirmLabel: 'Remove member', danger: true })">{% icon "x" 16 %}</button>
+            {% endif %}
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

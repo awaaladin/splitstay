@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Ledger · {{ group.name }} · SplitStay{% endblock %}
+
+{% block content %}
+<div class="page">
+  <a href="{% url 'web:group_detail' group.pk %}" class="btn-quiet btn-sm -ml-3 mb-4 inline-flex">{% icon "arrow-left" 16 %} {{ group.name }}</a>
+  <h1 class="page-title">Ledger</h1>
+  <p class="mt-1 max-w-2xl text-body text-muted">A complete record of {{ group.name }}, visible to every member. Nothing here is edited after the fact; the totals are always added up from the entries.</p>
+
+  <dl class="card mt-6 grid divide-y divide-line sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+    <div class="p-5"><dt class="eyebrow">Target</dt><dd class="amount mt-1 text-lead">{{ summary.target|naira }}</dd></div>
+    <div class="p-5"><dt class="eyebrow">Collected</dt><dd class="amount mt-1 text-lead">{{ summary.funded|naira }}</dd></div>
+    <div class="p-5"><dt class="eyebrow">Service fee</dt><dd class="amount mt-1 text-lead">{% if summary.fee is not None %}{{ summary.fee|naira }}{% else %}<span class="text-muted">At payout</span>{% endif %}</dd></div>
+    <div class="p-5"><dt class="eyebrow">Paid out</dt><dd class="amount mt-1 text-lead">{% if summary.net is not None %}{{ summary.net|naira }}{% else %}<span class="text-muted">Not yet</span>{% endif %}</dd></div>
+  </dl>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-3">
+    <section class="card lg:col-span-2">
+      <div class="px-5 pt-5 sm:px-6"><h2 class="section-title">All entries</h2></div>
+      <ul class="mt-4 divide-line">
+        {% for e in page %}{% include "groups/_entry.html" %}
+        {% empty %}<li class="px-6 py-10 text-center text-body text-muted">No entries yet.</li>{% endfor %}
+      </ul>
+      {% if page.paginator.num_pages > 1 %}
+      <nav class="flex items-center justify-between border-t border-line px-5 py-3 sm:px-6" aria-label="Pagination">
+        {% if page.has_previous %}<a class="btn-secondary btn-sm" href="?page={{ page.previous_page_number }}">Newer</a>{% else %}<span></span>{% endif %}
+        <span class="meta tnum">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}<a class="btn-secondary btn-sm" href="?page={{ page.next_page_number }}">Older</a>{% else %}<span></span>{% endif %}
+      </nav>
+      {% endif %}
+    </section>
+
+    <section class="card h-fit">
+      <div class="px-5 pt-5 sm:px-6"><h2 class="section-title">Standing by member</h2></div>
+      <ul class="mt-4 divide-line">
+        {% for r in rows %}
+        <li class="px-5 py-3.5 sm:px-6">
+          <div class="flex items-center justify-between gap-3">
+            <p class="truncate text-body font-medium">{{ r.user.display_name }}</p>
+            {% status_badge "member" r.state %}
+          </div>
+          <p class="meta tnum mt-0.5">{{ r.paid|naira }} of {{ r.share|naira }}</p>
+          <div class="bar mt-2"><i data-fill="{% if r.share %}{% widthratio r.paid r.share 100 %}{% else %}0{% endif %}"></i></div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

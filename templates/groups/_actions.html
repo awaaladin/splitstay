@@ -1,0 +1,55 @@
+{% load cp %}
+<section id="actions" class="card card-pad"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <h2 class="section-title">Your part</h2>
+
+  {% if my_row %}
+    <dl class="mt-4 space-y-2.5">
+      <div class="flex items-baseline justify-between"><dt class="meta">Your share</dt><dd class="amount text-body text-fg">{{ my_row.share|naira }}</dd></div>
+      <div class="flex items-baseline justify-between"><dt class="meta">You've paid</dt><dd class="amount text-body text-fg">{{ my_row.paid|naira }}</dd></div>
+      <div class="flex items-baseline justify-between border-t border-line pt-2.5"><dt class="meta font-medium text-fg">Outstanding</dt><dd class="amount text-lead text-fg">{{ my_row.outstanding|naira }}</dd></div>
+    </dl>
+  {% endif %}
+
+  {% if can_pay %}
+    <form method="post" action="{% url 'web:group_pay' group.pk %}" class="mt-5" data-busy>
+      {% csrf_token %}
+      <button type="submit" class="btn-primary btn-block">{% icon "wallet" 18 %} Pay {{ my_row.outstanding|naira }}</button>
+    </form>
+    <p class="hint">You'll pay securely through the payment gateway and come straight back here.</p>
+  {% elif my_row and my_row.outstanding == 0 and my_row.share > 0 %}
+    <p class="mt-5 flex items-center gap-2 rounded-md bg-ok-soft px-3 py-2.5 text-body text-ok">{% icon "check" 18 %} Your share is paid in full.</p>
+  {% endif %}
+
+  {% if record %}
+    <div class="mt-5 border-t border-line pt-5">
+      <p class="eyebrow">{% if is_bill %}Bill payment{% else %}Bank transfer{% endif %}</p>
+      <p class="mt-1">{% status_badge "payout" record.status %}</p>
+      {% if record.status == 'completed' %}
+        <a href="{% url 'web:group_receipt' group.pk %}" class="btn-primary btn-block mt-3">{% icon "receipt" 18 %} View receipt</a>
+      {% elif record.status == 'failed' %}
+        <p class="mt-2 text-meta text-danger">{{ record.failure_reason|default:"The payment could not be completed." }}</p>
+        {% if can_retry %}
+          <form method="post" action="{% url 'web:group_payout' group.pk %}" class="mt-3" data-busy>{% csrf_token %}
+            <button class="btn-primary btn-block">{% icon "refresh" 18 %} Retry payment</button>
+          </form>
+        {% else %}<p class="hint">The group admin can retry this.</p>{% endif %}
+      {% else %}
+        <p class="mt-2 text-meta text-muted">The payment is in progress. This page updates on its own.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if can_partial_payout %}
+    <div class="mt-5 border-t border-line pt-5">
+      <p class="eyebrow">Admin</p>
+      <button type="button" class="btn-secondary btn-block mt-2"
+        @click="$dispatch('confirm', { action: '{% url 'web:group_payout' group.pk %}', title: 'Pay out before the target is reached?', body: 'Only {{ progress.funded|naira }} of {{ progress.target|naira }} has been collected. The group closes to new contributions and the service fee is deducted from what has been collected.', confirmLabel: 'Pay out now' })">
+        {% icon "banknote" 18 %} Pay out {{ progress.funded|naira }} now
+      </button>
+    </div>
+  {% endif %}
+
+  {% if needs_review %}
+    <p class="alert-warn mt-5 text-meta">{% icon "alert" 18 "mt-0.5" %} <span>One or more payments arrived in an unusual state and need review. Check the ledger.</span></p>
+  {% endif %}
+</section>

@@ -1,0 +1,10 @@
+.venv
+node_modules
+static_src
+*.sqlite3
+media
+staticfiles
+.env
+.git
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,8 @@
+{% load cp %}
+{% if unavailable %}
+  <p class="flex items-center gap-2 text-warn">{% icon "alert" 18 %} The biller can't be reached right now. You can still create the group; the meter is checked again at payment.</p>
+{% elif info.valid %}
+  <p class="flex items-start gap-2 text-ok">{% icon "check" 18 "mt-0.5" %}<span><strong class="font-semibold">{{ info.name }}</strong>{% if info.address %}<span class="block text-meta text-muted">{{ info.address }}</span>{% endif %}</span></p>
+{% else %}
+  <p class="flex items-center gap-2 text-danger">{% icon "x" 18 %} {{ info.message|default:"That meter wasn't found." }}</p>
+{% endif %}

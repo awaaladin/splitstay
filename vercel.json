@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{node_modules/**,.venv/**,static_src/**,**/tests.py,*.sqlite3,media/**}"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }],
+  "crons": [
+    { "path": "/api/cron/enforce-deadlines/", "schedule": "15 0 * * *" },
+    { "path": "/api/cron/spawn-recurring-cycles/", "schedule": "0 1 * * *" },
+    { "path": "/api/cron/send-due-reminders/", "schedule": "0 7 * * *" },
+    { "path": "/api/cron/reconcile-pending-payouts/", "schedule": "30 * * * *" }
+  ]
+}

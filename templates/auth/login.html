@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block title %}Sign in · SplitStay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="mx-auto max-w-md pt-4 sm:pt-10">
+    <h1 class="page-title">Sign in</h1>
+    <p class="mt-1 text-body text-muted">Use the email or phone number on your account.</p>
+
+    <form method="post" class="card card-pad mt-6 space-y-5" data-busy novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert-danger">{% icon "alert" 20 "mt-0.5" %}<div>{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div></div>{% endif %}
+      {% include "partials/field.html" with field=form.identifier %}
+      {% include "partials/field.html" with field=form.password %}
+      <button type="submit" class="btn-primary btn-block">Sign in</button>
+    </form>
+    <p class="mt-5 text-center text-body text-muted">New here? <a class="font-medium text-primary hover:underline" href="{% url 'web:register' %}">Create an account</a></p>
+  </div>
+</div>
+{% endblock %}

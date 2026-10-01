@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load cp %}
+{% block content %}
+<div class="page">
+  <section class="grid gap-12 py-8 lg:grid-cols-5 lg:py-16">
+    <div class="lg:col-span-3">
+      <p class="eyebrow">Group contributions, done properly</p>
+      <h1 class="mt-4 text-display text-fg">Shared costs, settled in the open.</h1>
+      <p class="mt-5 max-w-xl text-lead text-muted">Roommates, families and friends pool money toward rent, light bills, subscriptions or family upkeep. When the target is met, SplitStay pays the bill or the recipient directly, and everyone can see exactly who paid and what was paid out.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="{% url 'web:register' %}" class="btn-primary">Start a group {% icon "arrow-right" 18 %}</a>
+        <a href="{% url 'web:login' %}" class="btn-secondary">Sign in</a>
+      </div>
+      <p class="mt-6 flex items-center gap-2 text-meta text-muted">{% icon "shield-check" 16 %} Not a loan. SplitStay never pays anything on your behalf in advance.</p>
+    </div>
+
+    <div class="lg:col-span-2">
+      <div class="card card-pad">
+        <p class="eyebrow">How the money moves</p>
+        <ol class="mt-5 space-y-6">
+          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "users" 18 %}</span><div><p class="text-body font-medium">Everyone pays their own share</p><p class="meta mt-0.5">Equal by default, or set exact amounts for uneven splits.</p></div></li>
+          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "wallet" 18 %}</span><div><p class="text-body font-medium">The group fills toward its target</p><p class="meta mt-0.5">Watch it fill live. Nothing is paid out early unless the admin allows it.</p></div></li>
+          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "zap" 18 %}</span><div><p class="text-body font-medium">The bill or landlord is paid directly</p><p class="meta mt-0.5">Electricity tokens are bought for your meter; rent goes to the recipient's bank account.</p></div></li>
+          <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-primary">{% icon "receipt" 18 %}</span><div><p class="text-body font-medium">Everything lands in the ledger</p><p class="meta mt-0.5">Contributions, the service fee and the payout, visible to every member.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid gap-6 border-t border-line py-12 sm:grid-cols-3">
+    <div><h2 class="section-title">Open to every member</h2><p class="mt-2 text-body text-muted">The way an ajo circle works: everyone can see who has paid and who hasn't. The ledger is not an admin-only view.</p></div>
+    <div><h2 class="section-title">One explicit fee</h2><p class="mt-2 text-body text-muted">A flat or percentage service fee is taken at payout and recorded as its own line, never as a silent deduction.</p></div>
+    <div><h2 class="section-title">Recurring, without the admin work</h2><p class="mt-2 text-body text-muted">A monthly light-bill group reopens on the same day with the same members and split.</p></div>
+  </section>
+</div>
+{% endblock %}

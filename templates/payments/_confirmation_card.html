@@ -1,0 +1,42 @@
+{% load cp %}
+<div id="confirm-card" class="card card-pad text-center"
+  {% if contribution.status == 'pending' %}hx-get="{% url 'web:contribution_confirmation' contribution.reference %}" hx-trigger="every 3s" hx-target="this" hx-swap="outerHTML" data-quiet{% endif %}>
+
+  {% if contribution.status == 'paid' %}
+    {# The check draws itself: ring first, then the tick. Brief and unceremonious. #}
+    <div class="relative mx-auto h-24 w-24 text-ok">
+      <span class="confirm-glow absolute inset-0 rounded-full bg-ok-soft"></span>
+      <svg viewBox="0 0 64 64" class="relative h-24 w-24" aria-hidden="true">
+        <circle class="confirm-ring" pathLength="1" cx="32" cy="32" r="28"/>
+        <path class="confirm-check" pathLength="1" d="M20 33.5 28.5 42 44 24"/>
+      </svg>
+    </div>
+    <div class="confirm-rise">
+      <h1 class="page-title mt-5">Payment confirmed</h1>
+      <p class="amount mt-2 text-figure text-fg">{{ contribution.amount|naira }}</p>
+      <p class="mt-1 text-body text-muted">toward <a class="font-medium text-fg hover:underline" href="{% url 'web:group_detail' group.pk %}">{{ group.name }}</a></p>
+      <dl class="mx-auto mt-6 max-w-xs space-y-2 border-t border-line pt-5 text-left">
+        <div class="flex justify-between gap-4"><dt class="meta">Reference</dt><dd class="receipt-mono text-meta">{{ contribution.reference }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="meta">Time</dt><dd class="tnum text-meta">{{ contribution.paid_at|date:"j M Y, g:i a" }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="meta">Group is now</dt><dd class="tnum text-meta">{{ group.percent_funded }}% funded</dd></div>
+      </dl>
+      <a href="{% url 'web:group_detail' group.pk %}" class="btn-primary mt-7">Back to the group {% icon "arrow-right" 18 %}</a>
+    </div>
+
+  {% elif contribution.status == 'failed' %}
+    <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-danger-soft text-danger">{% icon "x" 30 %}</span>
+    <h1 class="page-title mt-5">Payment didn't go through</h1>
+    <p class="mx-auto mt-2 max-w-sm text-body text-muted">{{ contribution.failure_reason|default:"The payment was declined or cancelled." }} Nothing was added to the group, and you can try again.</p>
+    <div class="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+      <a href="{% url 'web:group_detail' group.pk %}" class="btn-secondary">Back to the group</a>
+    </div>
+
+  {% else %}
+    {# Waiting for the gateway to confirm. The branded mark loops while we poll. #}
+    <div class="loader-stack mark-loop py-6">
+      {% logo_mark "confirm" 64 %}
+      <h1 class="section-title">Confirming your payment…</h1>
+      <p class="meta max-w-xs">This usually takes a few seconds. You can leave this page; we'll notify you once it's confirmed.</p>
+    </div>
+  {% endif %}
+</div>
