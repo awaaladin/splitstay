@@ -57,7 +57,7 @@ Alpine.js and HTMX are vendored in `static/vendor/`. Icons are inline Lucide out
 The repo is Vercel-ready: `api/index.py` (WSGI entry), `vercel.json` (rewrites, 60s function limit, crons) and `config/settings/vercel.py`.
 
 Vercel is serverless, so two things differ from the Docker setup:
-- **No Celery worker/Beat.** Tasks run inline in the request, and Vercel Cron calls `/api/cron/<task>/` (protected by `CRON_SECRET`) for deadlines, recurring cycles, reminders and payout reconciliation. Hobby plans only allow daily crons; the hourly reconcile job needs Pro (or trim it in `vercel.json`).
+- **No Celery worker/Beat.** Tasks run inline in the request, and Vercel Cron calls `/api/cron/<task>/` (protected by `CRON_SECRET`) for deadlines, recurring cycles, reminders and payout reconciliation. All four jobs are scheduled once a day so they fit Vercel's Hobby plan. On Pro you can run the payout-reconcile job more often (e.g. `*/10 * * * *`) in `vercel.json`.
 - **No persistent disk.** Avatar uploads aren't kept. Static files are served by WhiteNoise from the source tree.
 
 Steps:

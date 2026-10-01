@@ -11,6 +11,6 @@
     { "path": "/api/cron/enforce-deadlines/", "schedule": "15 0 * * *" },
     { "path": "/api/cron/spawn-recurring-cycles/", "schedule": "0 1 * * *" },
     { "path": "/api/cron/send-due-reminders/", "schedule": "0 7 * * *" },
-    { "path": "/api/cron/reconcile-pending-payouts/", "schedule": "30 * * * *" }
+    { "path": "/api/cron/reconcile-pending-payouts/", "schedule": "30 3 * * *" }
   ]
 }
