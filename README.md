@@ -43,8 +43,6 @@ The highest-risk areas have dedicated tests: contribution totals (`apps/contribu
 
 ## Frontend
 
-> Building or changing the UI? Read [DESIGN_AND_MOTION_GUIDE.md](DESIGN_AND_MOTION_GUIDE.md) first. It documents the animations, the user flow and the traps.
-
 Tailwind is configured in `tailwind.config.js` with an explicit palette (navy, charcoal ink, semantic tokens; no default blue/gray) and class-based dark mode. The compiled `static/css/app.css` is committed so the site runs without Node. To change styles:
 
 ```bash
