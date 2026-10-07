@@ -54,7 +54,7 @@ Alpine.js and HTMX are vendored in `static/vendor/`. Icons are inline Lucide out
 
 ## Deploy to Vercel
 
-The repo is Vercel-ready: `api/index.py` (WSGI entry), `vercel.json` (rewrites, 60s function limit, crons) and `config/settings/vercel.py`.
+The repo is Vercel-ready. Vercel detects Django and runs `config/wsgi.py` itself (no custom rewrites or `api/` entrypoint, which break routing); `config/settings/vercel.py` is selected automatically when `VERCEL` is set, and `vercel.json` only defines the cron jobs.
 
 Vercel is serverless, so two things differ from the Docker setup:
 - **No Celery worker/Beat.** Tasks run inline in the request, and Vercel Cron calls `/api/cron/<task>/` (protected by `CRON_SECRET`) for deadlines, recurring cycles, reminders and payout reconciliation. All four jobs are scheduled once a day so they fit Vercel's Hobby plan. On Pro you can run the payout-reconcile job more often (e.g. `*/10 * * * *`) in `vercel.json`.
