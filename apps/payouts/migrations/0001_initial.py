@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ('fee_type', models.CharField(choices=[('flat', 'Flat'), ('percent', 'Percentage')], max_length=8)),
                 ('rate', models.DecimalField(decimal_places=4, help_text='Naira if flat, percent if percentage', max_digits=10)),
                 ('amount', models.DecimalField(decimal_places=2, max_digits=14)),
-                ('description', models.CharField(default='SplitStay service fee', max_length=120)),
+                ('description', models.CharField(default='SplitPay service fee', max_length=120)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('bill_payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fees', to='billpay.billpayment')),
                 ('payout', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fees', to='payouts.payout')),

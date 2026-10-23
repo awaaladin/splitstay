@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}SplitStay{% endblock %}</title>
-  <meta name="description" content="{% block description %}Pool money with the people you share costs with. SplitStay pays the bill or the landlord once the target is met.{% endblock %}">
+  <title>{% block title %}SplitPay{% endblock %}</title>
+  <meta name="description" content="{% block description %}Pool money with the people you share costs with. SplitPay pays the bill or the landlord once the target is met.{% endblock %}">
   <meta name="theme-color" content="#102a56">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='7' fill='none' stroke='%23102a56' stroke-width='2.5'/%3E%3Cpath d='M4 17q4-3 8 0t8 0 8 0v11H4z' fill='%23102a56'/%3E%3C/svg%3E">
   <script>
@@ -37,7 +37,7 @@
   <div id="boot" aria-hidden="true">
     <div class="loader-stack">
       {% logo_mark "boot" 68 %}
-      <div class="loader-word">Split<span>Stay</span></div>
+      <div class="loader-word">Split<span>Pay</span></div>
     </div>
   </div>
 
@@ -53,9 +53,9 @@
 
   <header class="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur" x-data="{ mobile: false }">
     <div class="page flex h-16 items-center gap-3">
-      <a href="{% if user.is_authenticated %}{% url 'web:dashboard' %}{% else %}{% url 'web:landing' %}{% endif %}" class="flex items-center gap-2.5 text-primary" aria-label="SplitStay home">
+      <a href="{% if user.is_authenticated %}{% url 'web:dashboard' %}{% else %}{% url 'web:landing' %}{% endif %}" class="flex items-center gap-2.5 text-primary" aria-label="SplitPay home">
         {% logo_mark "nav" 30 %}
-        <span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Stay</span></span>
+        <span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Pay</span></span>
       </a>
 
       {% if user.is_authenticated %}
@@ -155,7 +155,7 @@
   <footer class="border-t border-line py-12 no-print">
     <div class="page grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
       <div class="lg:col-span-3">
-        <a href="/" class="flex items-center gap-2.5 text-primary" aria-label="SplitStay home">{% logo_mark "foot" 26 %}<span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Stay</span></span></a>
+        <a href="/" class="flex items-center gap-2.5 text-primary" aria-label="SplitPay home">{% logo_mark "foot" 26 %}<span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Pay</span></span></a>
         <p class="mt-4 max-w-sm text-body text-muted">Group contributions for rent, light bills and family upkeep, paid out directly and recorded in the open.</p>
       </div>
       <div>
@@ -182,7 +182,7 @@
       </div>
     </div>
     <div class="page mt-10 flex flex-col gap-2 border-t border-line pt-6 text-meta text-muted sm:flex-row sm:items-center sm:justify-between">
-      <p>© {% now "Y" %} SplitStay. Payments are collected by Paystack. SplitStay never lends money on anyone's behalf.</p>
+      <p>© {% now "Y" %} SplitPay. Payments are collected by Paystack. SplitPay never lends money on anyone's behalf.</p>
       <p class="flex items-center gap-2">{% icon "shield-check" 16 %} Every naira is recorded in the group ledger.</p>
     </div>
   </footer>

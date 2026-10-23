@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.conf import settings
 from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import serializers
 
@@ -62,13 +63,13 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class MemberInputSerializer(serializers.Serializer):
-    identifier = serializers.CharField(help_text="Email address or phone number of an existing SplitStay user")
+    identifier = serializers.CharField(help_text="Email address or phone number of an existing SplitPay user")
     contribution_share = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, min_value=1)
 
     def validate_identifier(self, value):
         user = find_user(value)
         if user is None:
-            raise serializers.ValidationError(f"No SplitStay account found for '{value}'.")
+            raise serializers.ValidationError(f"No SplitPay account found for '{value}'.")
         self.context["resolved_user"] = user
         return value
 
@@ -103,6 +104,8 @@ class GroupWriteSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         payout_type = attrs.get("payout_type", getattr(self.instance, "payout_type", None))
+        if payout_type == PayoutType.BILL_PAYMENT and self.instance is None and not settings.BILL_PAYMENTS_ENABLED:
+            raise serializers.ValidationError({"payout_type": "Electricity bill payment isn't switched on yet."})
         if payout_type == PayoutType.BILL_PAYMENT:
             service = attrs.get("bill_service_id", getattr(self.instance, "bill_service_id", ""))
             biller = catalog.get_biller(service)

@@ -10,6 +10,7 @@ CELERY_TASK_EAGER_PROPAGATES = True
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 PAYMENT_GATEWAY = "mock"
 BILL_PROVIDER = "mock"
+BILL_PAYMENTS_ENABLED = True
 PAYSTACK_SECRET_KEY = "sk_test_unit"
 SERVICE_FEE_TYPE = "flat"
 SERVICE_FEE_FLAT = 150

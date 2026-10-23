@@ -1,10 +1,9 @@
-import uuid
-
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
 from apps.accounts.fields import EncryptedTextField
+from apps.payments.naming import make_transfer_reference
 
 
 class PayoutStatus(models.TextChoices):
@@ -16,7 +15,7 @@ class PayoutStatus(models.TextChoices):
 
 def new_payout_reference() -> str:
     # Paystack transfer references must be lowercase alphanumerics, dashes or underscores.
-    return f"cp-po-{uuid.uuid4().hex[:24]}"
+    return make_transfer_reference("PAYOUT")
 
 
 class Payout(models.Model):
@@ -76,7 +75,7 @@ class Fee(models.Model):
     fee_type = models.CharField(max_length=8, choices=FeeType.choices)
     rate = models.DecimalField(max_digits=10, decimal_places=4, help_text="Naira if flat, percent if percentage")
     amount = models.DecimalField(max_digits=14, decimal_places=2)
-    description = models.CharField(max_length=120, default="SplitStay service fee")
+    description = models.CharField(max_length=120, default="SplitPay service fee")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

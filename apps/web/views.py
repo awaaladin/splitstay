@@ -185,7 +185,7 @@ def register(request):
         user.profile.phone_number = form.cleaned_data["phone_number"]
         user.profile.save()
         login(request, user, backend="apps.accounts.backends.EmailOrPhoneBackend")
-        messages.success(request, "Welcome to SplitStay. Your account is ready.")
+        messages.success(request, "Welcome to SplitPay. Your account is ready.")
         return redirect("web:dashboard")
     return render(request, "auth/register.html", {"form": form})
 
@@ -266,7 +266,7 @@ def _read_member_rows(request):
             continue
         user = group_services.find_user(raw)
         if user is None:
-            problems.append(f"No SplitStay account found for “{raw}”. They need to register first.")
+            problems.append(f"No SplitPay account found for “{raw}”. They need to register first.")
             continue
         share = None
         share_raw = (shares[index] if index < len(shares) else "").strip().replace(",", "")
@@ -314,7 +314,7 @@ def group_new(request):
 
     return render(request, "groups/form.html", {
         "form": form, "member_rows": member_rows, "editing": None,
-        "fee": _fee_policy(),
+        "fee": _fee_policy(), "bill_enabled": settings.BILL_PAYMENTS_ENABLED,
     })
 
 
@@ -347,7 +347,9 @@ def group_edit(request, pk):
         else:
             messages.success(request, "Group updated.")
             return redirect("web:group_detail", pk=pk)
-    return render(request, "groups/form.html", {"form": form, "editing": group, "member_rows": [], "fee": _fee_policy()})
+    return render(request, "groups/form.html", {
+        "form": form, "editing": group, "member_rows": [], "fee": _fee_policy(), "bill_enabled": settings.BILL_PAYMENTS_ENABLED,
+    })
 
 
 @login_required
@@ -388,7 +390,7 @@ def group_invite(request, pk):
         return redirect("web:group_detail", pk=pk)
     user = group_services.find_user(form.cleaned_data["identifier"])
     if user is None:
-        messages.error(request, "No SplitStay account matches that. They need to register first, then you can invite them.")
+        messages.error(request, "No SplitPay account matches that. They need to register first, then you can invite them.")
         return redirect("web:group_detail", pk=pk)
     try:
         membership = group_services.add_member(group, user, form.cleaned_data.get("contribution_share"))

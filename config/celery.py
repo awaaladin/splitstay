@@ -8,6 +8,6 @@ os.environ.setdefault(
     "config.settings.vercel" if os.environ.get("VERCEL") else "config.settings.dev",
 )
 
-app = Celery("splitstay")
+app = Celery("splitpay")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()

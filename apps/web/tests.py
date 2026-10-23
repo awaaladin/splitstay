@@ -48,7 +48,7 @@ class SeededPagesTests(TestCase):
         call_command("seed_demo", verbosity=0)
 
     def login(self, handle="ada"):
-        self.client.login(username=f"{handle}@demo.splitstay.test", password="demo12345")
+        self.client.login(username=f"{handle}@demo.splitpay.test", password="demo12345")
 
     def test_seed_creates_three_groups_with_expected_states(self):
         names = set(ContributionGroup.objects.filter(cycle_number=1).values_list("name", flat=True))

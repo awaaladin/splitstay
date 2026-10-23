@@ -27,6 +27,7 @@ class ChargeVerification:
     status: str  # "success" | "failed" | "pending"
     amount: Decimal | None = None
     gateway_reference: str = ""
+    fees: Decimal | None = None  # what the gateway charged us for this collection
 
 
 @dataclass
@@ -43,6 +44,7 @@ class WebhookData:
     reference: str = ""
     amount: Decimal | None = None
     gateway_reference: str = ""
+    fees: Decimal | None = None
     raw: dict = field(default_factory=dict)
 
 

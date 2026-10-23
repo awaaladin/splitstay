@@ -17,7 +17,7 @@ from apps.groups import services as group_services
 from apps.groups.models import ContributionGroup
 from apps.testing import pay
 
-DEMO_DOMAIN = "demo.splitstay.test"
+DEMO_DOMAIN = "demo.splitpay.test"
 PASSWORD = "demo12345"
 
 PEOPLE = [

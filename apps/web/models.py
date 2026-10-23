@@ -6,7 +6,7 @@ class ContactMessage(models.Model):
     """Messages sent through the public contact form. Read them in the Django admin."""
 
     class Topic(models.TextChoices):
-        HELP = "help", "I need help using SplitStay"
+        HELP = "help", "I need help using SplitPay"
         PAYMENT = "payment", "A payment or payout question"
         BUG = "bug", "Something isn't working"
         IDEA = "idea", "An idea or feedback"

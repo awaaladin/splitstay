@@ -21,6 +21,7 @@ from apps.notifications import events
 
 from .gateways import GatewayError, get_gateway
 from .models import WebhookEvent
+from .naming import is_ours, paystack_metadata
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +47,12 @@ def start_checkout(contribution: Contribution) -> str:
         amount=contribution.amount,
         email=contribution.member.email,
         callback_url=callback,
-        metadata={"group_id": contribution.group_id, "member_id": contribution.member_id},
+        metadata=paystack_metadata(
+            "CONTRIB",
+            f"Contribution to {contribution.group.name}",
+            group_id=contribution.group_id,
+            member_id=contribution.member_id,
+        ),
     )
     contribution.gateway = gateway.name
     contribution.gateway_reference = session.gateway_reference
@@ -58,10 +64,15 @@ def start_checkout(contribution: Contribution) -> str:
 # --- Confirmation -------------------------------------------------------------
 
 @transaction.atomic
-def confirm_contribution(reference: str, *, paid_amount: Decimal | None = None, gateway_reference: str = "") -> ConfirmResult:
+def confirm_contribution(reference: str, *, paid_amount: Decimal | None = None, gateway_reference: str = "",
+                         gateway_fee: Decimal | None = None) -> ConfirmResult:
     """Mark a contribution paid exactly once and evaluate the group's funding threshold."""
     contribution = Contribution.objects.select_for_update().get(reference=reference)
     if contribution.status == ContributionStatus.PAID:
+        # A late duplicate (webhook after the return-trip verify, or vice versa) may carry the fee.
+        if gateway_fee is not None and contribution.gateway_fee is None:
+            contribution.gateway_fee = gateway_fee
+            contribution.save(update_fields=["gateway_fee"])
         return ConfirmResult(contribution, False)
 
     if paid_amount is not None and paid_amount < contribution.amount:
@@ -79,6 +90,8 @@ def confirm_contribution(reference: str, *, paid_amount: Decimal | None = None, 
     contribution.failure_reason = ""
     if gateway_reference:
         contribution.gateway_reference = gateway_reference
+    if gateway_fee is not None:
+        contribution.gateway_fee = gateway_fee
     notes = []
     if paid_amount is not None and paid_amount > contribution.amount:
         notes.append(f"Gateway reported {paid_amount}; credited {contribution.amount}")
@@ -120,7 +133,8 @@ def verify_and_confirm(contribution: Contribution) -> Contribution:
         return contribution
     if result.status == "success":
         return confirm_contribution(
-            contribution.reference, paid_amount=result.amount, gateway_reference=result.gateway_reference
+            contribution.reference, paid_amount=result.amount, gateway_reference=result.gateway_reference,
+            gateway_fee=result.fees,
         ).contribution
     if result.status == "failed":
         return fail_contribution(contribution.reference)
@@ -161,6 +175,12 @@ def process_webhook(provider: str, raw_body: bytes, payload: dict) -> str:
     data = gateway.parse_webhook(payload)
     if data.kind == "other" or not data.event_id:
         return "ignored"
+    # The Paystack account (and its single webhook) is shared with other apps: only act on, and
+    # only store, events that are provably SplitPay's.
+    metadata = ((payload.get("data") or {}).get("metadata")) if isinstance(payload, dict) else None
+    if not is_ours(data.reference, metadata):
+        log.info("Ignoring webhook %s for another app (reference %s)", data.event_id, data.reference)
+        return "ignored"
 
     try:
         with transaction.atomic():
@@ -180,7 +200,8 @@ def process_webhook(provider: str, raw_body: bytes, payload: dict) -> str:
     try:
         outcome = "processed"
         if data.kind == "charge.success":
-            confirm_contribution(data.reference, paid_amount=data.amount, gateway_reference=data.gateway_reference)
+            confirm_contribution(data.reference, paid_amount=data.amount, gateway_reference=data.gateway_reference,
+                                 gateway_fee=data.fees)
         elif data.kind == "transfer.success":
             apply_transfer_result(data.reference, "success", data.gateway_reference)
         elif data.kind == "transfer.failed":

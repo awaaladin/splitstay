@@ -1,4 +1,4 @@
-# SplitStay
+# SplitPay
 
 Group contribution and bill-payment platform for the Nigerian market (the digital *ajo/esusu*). Members pool money toward rent, electricity (NEPA/disco) bills, subscriptions, family upkeep or anything custom; once the target is met the platform pays the bill or the recipient directly. It is not a lending product: nothing is ever paid on a member's behalf in advance.
 
@@ -15,7 +15,7 @@ docker-compose up --build            # web, db, redis, celery worker, celery bea
 docker-compose exec web python manage.py seed_demo
 ```
 
-Open http://localhost:8000. Migrations run automatically on `web` start. Demo login: `ada@demo.splitstay.test` / `demo12345` (also `tunde@`, `chioma@`, `ibrahim@`, `ngozi@` at the same domain).
+Open http://localhost:8000. Migrations run automatically on `web` start. Demo login: `ada@demo.splitpay.test` / `demo12345` (also `tunde@`, `chioma@`, `ibrahim@`, `ngozi@` at the same domain).
 
 - API docs (Swagger): http://localhost:8000/api/docs/ · schema: http://localhost:8000/api/schema/
 - Defaults use the **mock** payment gateway and bill provider: checkout is a sandbox page, no real money moves. Set `PAYMENT_GATEWAY=paystack`, `PAYSTACK_SECRET_KEY`, `BILL_PROVIDER=vtpass` and the VTpass keys for real integrations (see `.env.example`).
@@ -79,7 +79,22 @@ Steps:
 | `REDIS_URL` | optional (Upstash `rediss://` URL) |
 | `ALLOW_DEMO_MODE` | `1` only for a demo deployment using the mock gateway |
 
-4. `vercel --prod` (or connect the Git repo). Point Paystack's webhook at `https://<your-domain>/api/v1/payments/webhooks/paystack/`.
+4. `vercel --prod` (or connect the Git repo). The Paystack account is shared with five other apps and Paystack allows one webhook URL per account, so that URL points at the shared router (`/api/paystack-webhook`, hosted inside Choropia: `choropia/payments/webhook_router.py`). The router forwards SplitPay's events to `https://<your-domain>/api/v1/payments/webhooks/paystack/` and needs `SPLITPAY` in its `APP_CODES` plus `ROUTE_SPLITPAY` set to that URL.
+
+### Paystack accounting (shared account)
+
+Every SplitPay transaction is labelled so it can be separated from the other apps' in Paystack exports (`apps/payments/naming.py`):
+
+| What | Reference | Metadata |
+|---|---|---|
+| Member contribution (collection) | `SPLITPAY-CONTRIB-YYYYMMDD-<12 hex>` | `app=SPLITPAY`, `app_name=SplitPay`, dashboard custom fields "App" and "Payment for" |
+| Payout to a recipient (transfer) | `splitpay-payout-YYYYMMDD-<16 hex>` (lowercase: Paystack requires it) | recipient tagged `app=SPLITPAY`; reason starts "SplitPay:" |
+
+In the Paystack dashboard, search or filter exports for `SPLITPAY`. The webhook ignores (and never stores) any event whose reference or `metadata.app` is not SplitPay's.
+
+`python manage.py splitpay_report [--from YYYY-MM-DD --to YYYY-MM-DD] [--csv file]` prints profit and loss from SplitPay's own records: service fees earned, Paystack's real charge on every collection (recorded from Paystack), the estimated transfer fee, and the member money still held (not revenue).
+
+Local development uses `PAYMENT_GATEWAY=mock`; only the production deployment is set to `paystack`. Electricity-bill groups stay switched off until `BILL_PROVIDER=vtpass` with `VTPASS_API_KEY`/`VTPASS_SECRET_KEY` are set (`BILL_PAYMENTS_ENABLED`).
 5. Optional demo data: `python manage.py seed_demo` with the same `DATABASE_URL`.
 
 ## Layout

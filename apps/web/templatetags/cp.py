@@ -150,7 +150,7 @@ def mask_meter(value):
 
 @register.simple_tag
 def logo_mark(uid="m", size=32):
-    """The SplitStay mark: a vessel filling with liquid. `uid` keeps clipPath ids unique per instance."""
+    """The SplitPay mark: a vessel filling with liquid. `uid` keeps clipPath ids unique per instance."""
     return format_html(
         '<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 32 32" fill="none" aria-hidden="true">'
         '<defs><clipPath id="cp-clip-{uid}"><rect x="4" y="4" width="24" height="24" rx="7"/></clipPath></defs>'

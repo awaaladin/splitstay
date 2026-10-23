@@ -100,7 +100,7 @@ TEMPLATES = [
 
 DATABASES = {
     "default": dj_database_url.parse(
-        env("DATABASE_URL", "postgres://splitstay:splitstay@localhost:5432/splitstay"),
+        env("DATABASE_URL", "postgres://splitpay:splitpay@localhost:5432/splitpay"),
         conn_max_age=60,
     )
 }
@@ -183,7 +183,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 SPECTACULAR_SETTINGS = {
-    "TITLE": "SplitStay API",
+    "TITLE": "SplitPay API",
     "DESCRIPTION": "Group contribution and bill-payment platform.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
@@ -199,8 +199,13 @@ FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY")  # urlsafe-base64 Fernet key
 
 # Which collection/disbursement gateway to use: "paystack" or "mock".
 PAYMENT_GATEWAY = env("PAYMENT_GATEWAY", "mock")
-PAYSTACK_SECRET_KEY = env("PAYSTACK_SECRET_KEY", "")
+# The Paystack account is shared with other apps. Every reference/metadata we send is tagged
+# SPLITPAY (apps/payments/naming.py) so dashboard exports can be split per product.
+PAYSTACK_SECRET_KEY = env("PAYSTACK_SECRET_KEY") or env("PAYSTACK_API", "")
 PAYSTACK_BASE_URL = env("PAYSTACK_BASE_URL", "https://api.paystack.co")
+# Paystack's published charges, used only to ESTIMATE costs in `manage.py splitpay_report` for
+# transfers (collections record Paystack's real fee). Check them against your dashboard.
+PAYSTACK_TRANSFER_FEES = [(Decimal("5000"), Decimal("10")), (Decimal("50000"), Decimal("25")), (None, Decimal("50"))]
 SITE_URL = env("SITE_URL", "http://localhost:8000")
 
 # Bill providers: "vtpass" or "mock".
@@ -209,6 +214,11 @@ VTPASS_BASE_URL = env("VTPASS_BASE_URL", "https://sandbox.vtpass.com/api")
 VTPASS_API_KEY = env("VTPASS_API_KEY", "")
 VTPASS_SECRET_KEY = env("VTPASS_SECRET_KEY", "")
 VTPASS_PUBLIC_KEY = env("VTPASS_PUBLIC_KEY", "")
+# Electricity-bill groups are only offered when bills can really be paid. With real money moving,
+# a mock provider would hand out fake tokens, so it only counts when the gateway is mock as well.
+BILL_PAYMENTS_ENABLED = (BILL_PROVIDER == "vtpass" and bool(VTPASS_API_KEY and VTPASS_SECRET_KEY)) or (
+    BILL_PROVIDER == "mock" and PAYMENT_GATEWAY == "mock"
+)
 
 # Service fee applied at payout time: "flat" (naira) or "percent".
 SERVICE_FEE_TYPE = env("SERVICE_FEE_TYPE", "flat")

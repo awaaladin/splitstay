@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load cp l10n %}
-{% block title %}{{ group.name }} · SplitStay{% endblock %}
+{% block title %}{{ group.name }} · SplitPay{% endblock %}
 
 {% block content %}
 <div class="page" x-data="{ invite: false, share: { open: false, action: '', name: '', value: '' } }"
@@ -91,7 +91,7 @@
           x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
       {% csrf_token %}
       <h2 class="section-title">Add a member</h2>
-      <p class="mt-1 text-body text-muted">They need a SplitStay account. Everyone else's share is rebalanced automatically.</p>
+      <p class="mt-1 text-body text-muted">They need a SplitPay account. Everyone else's share is rebalanced automatically.</p>
       <div class="mt-5 space-y-4">
         <div><label class="label" for="inv-id">Email or phone number</label><input id="inv-id" name="identifier" class="input" required x-init="$watch('invite', v => v && $nextTick(() => $el.focus()))"></div>
         <div><label class="label" for="inv-share">Custom share (₦, optional)</label><input id="inv-share" name="contribution_share" inputmode="decimal" class="input tnum" placeholder="Leave blank to split equally"></div>

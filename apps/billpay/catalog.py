@@ -1,4 +1,4 @@
-"""The billers SplitStay can pay. Adding airtime, cable TV or water = adding rows + a category here;
+"""The billers SplitPay can pay. Adding airtime, cable TV or water = adding rows + a category here;
 the group, contribution and payout code never mentions a specific biller."""
 from dataclasses import dataclass
 

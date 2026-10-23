@@ -9,7 +9,7 @@
       <header class="receipt-line flex items-start justify-between" style="--i:0">
         <div class="flex items-center gap-2.5 text-primary">
           {% logo_mark "rcpt" 28 %}
-          <span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Stay</span></span>
+          <span class="text-lead font-semibold tracking-tight text-fg">Split<span class="text-primary">Pay</span></span>
         </div>
         <div class="text-right">
           <p class="eyebrow">{% if is_bill %}Bill payment{% else %}Bank transfer{% endif %} receipt</p>
@@ -75,7 +75,7 @@
       </dl>
       {% if record.is_partial %}<p class="receipt-line mt-4 text-meta text-muted" style="--i:11">Paid out early at the admin's request, before the {{ group.target_amount|naira }} target was reached.</p>{% endif %}
 
-      <p class="receipt-line mt-7 text-center text-micro normal-case tracking-normal text-muted" style="--i:12">Issued by SplitStay. The full history of this group is in its ledger.</p>
+      <p class="receipt-line mt-7 text-center text-micro normal-case tracking-normal text-muted" style="--i:12">Issued by SplitPay. The full history of this group is in its ledger.</p>
     </article>
   </div>
 

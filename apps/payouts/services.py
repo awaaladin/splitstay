@@ -120,7 +120,7 @@ def execute_transfer(payout_id: int) -> None:
         result = gateway.initiate_transfer(
             reference=payout.reference, amount=payout.net_amount,
             account_number=payout.recipient_account_number, bank_code=payout.recipient_bank_code,
-            account_name=payout.recipient_account_name, narration=f"SplitStay: {payout.group.name}",
+            account_name=payout.recipient_account_name, narration=f"SplitPay: {payout.group.name}",
         )
     except GatewayRejected as exc:
         _finish_transfer(payout.pk, PayoutStatus.FAILED, reason=str(exc))

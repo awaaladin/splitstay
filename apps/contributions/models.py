@@ -1,8 +1,8 @@
-import uuid
-
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum
+
+from apps.payments.naming import make_reference
 
 
 class ContributionStatus(models.TextChoices):
@@ -12,7 +12,7 @@ class ContributionStatus(models.TextChoices):
 
 
 def new_reference() -> str:
-    return f"CP-{uuid.uuid4().hex[:20].upper()}"
+    return make_reference("CONTRIB")
 
 
 class ContributionQuerySet(models.QuerySet):
@@ -38,6 +38,8 @@ class Contribution(models.Model):
     gateway = models.CharField(max_length=20, blank=True)
     gateway_reference = models.CharField(max_length=100, blank=True)
     checkout_url = models.URLField(max_length=500, blank=True)
+    # What the gateway charged us to collect this payment (from Paystack), for profit/loss accounts.
+    gateway_fee = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
     failure_reason = models.CharField(max_length=200, blank=True)
     # Money arrived in a state we can't auto-reconcile (group already closed, overpayment, ...).
     needs_review = models.BooleanField(default=False)

@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120)),
                 ('email', models.EmailField(max_length=254)),
-                ('topic', models.CharField(choices=[('help', 'I need help using SplitStay'), ('payment', 'A payment or payout question'), ('bug', "Something isn't working"), ('idea', 'An idea or feedback'), ('other', 'Something else')], default='help', max_length=10)),
+                ('topic', models.CharField(choices=[('help', 'I need help using SplitPay'), ('payment', 'A payment or payout question'), ('bug', "Something isn't working"), ('idea', 'An idea or feedback'), ('other', 'Something else')], default='help', max_length=10)),
                 ('message', models.TextField(max_length=4000)),
                 ('reference', models.CharField(blank=True, help_text='Group name or payment reference, if any', max_length=60)),
                 ('is_resolved', models.BooleanField(default=False)),

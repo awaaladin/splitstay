@@ -1,6 +1,7 @@
 from datetime import date
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 
@@ -104,6 +105,8 @@ class GroupForm(forms.Form):
         if data.get("is_recurring") and not data.get("recurrence_interval"):
             self.add_error("recurrence_interval", "Choose how often this repeats.")
         payout_type = self.editing.payout_type if self.editing else data.get("payout_type")
+        if payout_type == "bill_payment" and not settings.BILL_PAYMENTS_ENABLED and not self.editing:
+            self.add_error("payout_type", "Electricity bill payment isn't switched on yet. Choose bank transfer for now.")
         if payout_type == "bill_payment":
             if not data.get("bill_service_id"):
                 self.add_error("bill_service_id", "Choose the electricity company.")

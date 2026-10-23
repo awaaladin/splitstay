@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static cp %}
-{% block title %}Contact · SplitStay{% endblock %}
+{% block title %}Contact · SplitPay{% endblock %}
 {% block description %}Questions, problems or ideas? Send us a message.{% endblock %}
 {% block content %}
 <div class="page">
@@ -11,7 +11,7 @@
       <p class="mt-4 text-lead text-muted">Tell us what's happening and we'll reply to the email you give us. The more detail the better, especially a payment reference or the group's name.</p>
 
       <ul class="mt-8 space-y-5">
-        <li class="flex gap-4"><span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary-soft text-primary">{% icon "wallet" 20 %}</span><div><p class="text-body font-medium">A payment question?</p><p class="meta">Include the payment reference from your confirmation page (it starts with CP-). It lets us find the exact payment.</p></div></li>
+        <li class="flex gap-4"><span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary-soft text-primary">{% icon "wallet" 20 %}</span><div><p class="text-body font-medium">A payment question?</p><p class="meta">Include the payment reference from your confirmation page (it starts with SPLITPAY-). It lets us find the exact payment.</p></div></li>
         <li class="flex gap-4"><span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary-soft text-primary">{% icon "list" 20 %}</span><div><p class="text-body font-medium">Not sure how something works?</p><p class="meta">The <a class="font-medium text-primary hover:underline" href="{% url 'web:guide' %}">step-by-step guide</a> answers most questions in plain language.</p></div></li>
         <li class="flex gap-4"><span class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-primary-soft text-primary">{% icon "lock" 20 %}</span><div><p class="text-body font-medium">Keep it safe</p><p class="meta">Never send your password, card number or PIN. We will never ask for them.</p></div></li>
       </ul>

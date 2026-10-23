@@ -212,3 +212,38 @@ class WebhookIdempotencyTests(TestCase):
         self.assertEqual(payout.status, PayoutStatus.COMPLETED)
         self.assertEqual(group.status, GroupStatus.PAID_OUT)
         self.assertEqual(Notification.objects.filter(kind="payout_done", group=group).count(), 2)
+
+
+class SharedAccountNamingTests(TestCase):
+    """Paystack is shared with other apps, so SplitPay's money must be recognisable by its reference."""
+
+    def test_contribution_reference_names_the_app(self):
+        group = make_group()
+        contribution = initiate_contribution(group, group.memberships.order_by("id").first().user)
+        self.assertRegex(contribution.reference, r"^SPLITPAY-CONTRIB-\d{8}-[0-9A-F]{12}$")
+        self.assertLessEqual(len(contribution.reference), Contribution._meta.get_field("reference").max_length)
+
+    def test_payout_reference_is_a_valid_lowercase_transfer_reference(self):
+        from apps.payouts.models import new_payout_reference
+
+        reference = new_payout_reference()
+        self.assertRegex(reference, r"^splitpay-payout-\d{8}-[0-9a-f]{16}$")
+        self.assertLessEqual(len(reference), 50)
+
+    def test_checkout_sends_app_metadata(self):
+        from unittest import mock
+
+        from apps.payments.gateways.base import CheckoutSession
+
+        group = make_group()
+        contribution = initiate_contribution(group, group.memberships.order_by("id").first().user)
+        gateway = mock.Mock(name="gateway")
+        gateway.name = "paystack"
+        gateway.initialize_payment.return_value = CheckoutSession(url="https://checkout.paystack.com/x", gateway_reference="ac")
+        with mock.patch("apps.payments.services.get_gateway", return_value=gateway):
+            services.start_checkout(contribution)
+        metadata = gateway.initialize_payment.call_args.kwargs["metadata"]
+        self.assertEqual(metadata["app"], "SPLITPAY")
+        self.assertEqual(metadata["purpose"], "CONTRIB")
+        self.assertEqual(metadata["group_id"], group.pk)
+        self.assertEqual(metadata["custom_fields"][0]["value"], "SplitPay")

@@ -1,4 +1,4 @@
-/* SplitStay front-end behaviour. Alpine handles UI state; this file holds the few things that need
+/* SplitPay front-end behaviour. Alpine handles UI state; this file holds the few things that need
    real timing control: the boot screen, the pot fill, number count-ups and the delayed busy state. */
 (function () {
   'use strict';
@@ -37,7 +37,7 @@
         setPurpose: function (p) {
           this.purpose = p;
           if (this.editing) return;
-          this.payoutType = p === 'electricity' ? 'bill_payment' : 'bank_transfer';
+          this.payoutType = (p === 'electricity' && cfg.billEnabled) ? 'bill_payment' : 'bank_transfer';
         },
         addMember: function () { this.members.push({ identifier: '', share: '' }); },
         removeMember: function (i) { this.members.splice(i, 1); },

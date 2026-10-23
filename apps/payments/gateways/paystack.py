@@ -60,7 +60,9 @@ class PaystackGateway(PaymentGateway):
     def verify_payment(self, reference):
         data = self._request("GET", f"/transaction/verify/{reference}")
         status = {"success": "success", "failed": "failed", "abandoned": "failed"}.get(data["status"], "pending")
-        return ChargeVerification(status=status, amount=from_kobo(data["amount"]), gateway_reference=str(data.get("id", "")))
+        fees = from_kobo(data["fees"]) if data.get("fees") is not None else None
+        return ChargeVerification(status=status, amount=from_kobo(data["amount"]),
+                                  gateway_reference=str(data.get("id", "")), fees=fees)
 
     # -- webhooks ---------------------------------------------------------------
     def verify_webhook_signature(self, raw_body, headers):
@@ -81,14 +83,18 @@ class PaystackGateway(PaymentGateway):
         # Paystack has no stable event id, so identity = event type + the object it is about.
         event_id = f"{event}:{data.get('id') or reference}"
         amount = from_kobo(data["amount"]) if data.get("amount") is not None else None
+        fees = from_kobo(data["fees"]) if data.get("fees") is not None else None
         return WebhookData(event_id=event_id, kind=kind, reference=reference, amount=amount,
-                           gateway_reference=str(data.get("id", "")), raw=payload)
+                           gateway_reference=str(data.get("id", "")), fees=fees, raw=payload)
 
     # -- disbursement ---------------------------------------------------------------
     def initiate_transfer(self, *, reference, amount, account_number, bank_code, account_name, narration):
+        from apps.payments.naming import APP_CODE, APP_NAME
+
         recipient = self._request("POST", "/transferrecipient", json={
             "type": "nuban", "name": account_name, "account_number": account_number,
-            "bank_code": bank_code, "currency": "NGN",
+            "bank_code": bank_code, "currency": "NGN", "description": f"{APP_NAME} group payout",
+            "metadata": {"app": APP_CODE, "app_name": APP_NAME},
         })
         data = self._request("POST", "/transfer", json={
             "source": "balance", "amount": to_kobo(amount), "recipient": recipient["recipient_code"],

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load cp %}
-{% block title %}{% if editing %}Edit {{ editing.name }}{% else %}New group{% endif %} · SplitStay{% endblock %}
+{% block title %}{% if editing %}Edit {{ editing.name }}{% else %}New group{% endif %} · SplitPay{% endblock %}
 
 {% block content %}
 {{ member_rows|json_script:"gf-members" }}
@@ -11,6 +11,7 @@
     target: '{{ form.target_amount.value|default_if_none:'' }}',
     members: JSON.parse(document.getElementById('gf-members').textContent),
     editing: {{ editing|yesno:'true,false' }},
+    billEnabled: {{ bill_enabled|yesno:'true,false' }},
     fee: { type: '{{ fee.type }}', flat: {{ fee.flat }}, percent: {{ fee.percent }} }
   })">
 
@@ -18,7 +19,7 @@
   <h1 class="page-title">{% if editing %}Edit group{% else %}Start a group{% endif %}</h1>
   <p class="mt-1 max-w-2xl text-body text-muted">
     {% if editing %}Some things are locked once money is involved: the payout type, and (after the first payment) the target and members.
-    {% else %}Set a target and who is in. When the target is reached, SplitStay pays the bill or the recipient directly.{% endif %}
+    {% else %}Set a target and who is in. When the target is reached, SplitPay pays the bill or the recipient directly.{% endif %}
   </p>
 
   <form method="post" class="mt-8 grid gap-6 lg:grid-cols-3" data-busy novalidate>
@@ -87,11 +88,11 @@
               <span><span class="block text-body font-medium">Bank transfer</span><span class="hint mt-0.5 block">Rent to a landlord, or money to a family member's account.</span></span>
             </span>
           </label>
-          <label class="cursor-pointer">
-            <input type="radio" name="payout_type" value="bill_payment" class="peer sr-only" x-model="payoutType">
-            <span class="flex items-start gap-3 rounded-lg border border-line-strong p-4 transition-colors peer-checked:border-primary peer-checked:bg-primary-soft peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-primary hover:bg-sunken">
+          <label class="{% if bill_enabled %}cursor-pointer{% else %}cursor-not-allowed opacity-60{% endif %}">
+            <input type="radio" name="payout_type" value="bill_payment" class="peer sr-only" x-model="payoutType" {% if not bill_enabled %}disabled{% endif %}>
+            <span class="flex items-start gap-3 rounded-lg border border-line-strong p-4 transition-colors peer-checked:border-primary peer-checked:bg-primary-soft peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-primary {% if bill_enabled %}hover:bg-sunken{% endif %}">
               <span class="text-primary">{% icon "zap" 22 %}</span>
-              <span><span class="block text-body font-medium">Pay an electricity bill</span><span class="hint mt-0.5 block">We buy the units for your meter and give you the token.</span></span>
+              <span><span class="block text-body font-medium">Pay an electricity bill{% if not bill_enabled %} <span class="badge-neutral ml-1 !py-0">Coming soon</span>{% endif %}</span><span class="hint mt-0.5 block">{% if bill_enabled %}We buy the units for your meter and give you the token.{% else %}Not switched on yet. Use bank transfer for now.{% endif %}</span></span>
             </span>
           </label>
         </fieldset>
@@ -134,7 +135,7 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <h2 class="section-title">Who's in?</h2>
-            <p class="mt-1 text-body text-muted">You're included automatically. Invite others by the email or phone number on their SplitStay account. Shares are equal unless you set an amount.</p>
+            <p class="mt-1 text-body text-muted">You're included automatically. Invite others by the email or phone number on their SplitPay account. Shares are equal unless you set an amount.</p>
           </div>
         </div>
         <div class="mt-5 space-y-3">

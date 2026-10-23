@@ -1,5 +1,5 @@
 /**
- * SplitStay design tokens.
+ * SplitPay design tokens.
  *
  * `theme.colors` is set (not `extend`ed), so Tailwind's default blue/gray/etc. do not exist here.
  * Two brand colours only: deep navy and white. Everything else is either a neutral charcoal ramp

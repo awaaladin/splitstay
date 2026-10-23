@@ -29,8 +29,10 @@ for _name, _value in {
 DEMO_MODE = env_bool("ALLOW_DEMO_MODE", False)
 if PAYMENT_GATEWAY == "mock" and not DEMO_MODE:
     raise ImproperlyConfigured("PAYMENT_GATEWAY=mock requires ALLOW_DEMO_MODE=1 (demo deployments only)")
-if PAYMENT_GATEWAY == "paystack" and not PAYSTACK_SECRET_KEY:
-    raise ImproperlyConfigured("PAYSTACK_SECRET_KEY must be set")
+if PAYMENT_GATEWAY == "paystack" and not PAYSTACK_SECRET_KEY.startswith("sk_"):
+    raise ImproperlyConfigured("PAYSTACK_SECRET_KEY must be set to a Paystack secret key (sk_live_... / sk_test_...)")
+if PAYMENT_GATEWAY not in ("paystack", "mock"):
+    raise ImproperlyConfigured(f"Unknown PAYMENT_GATEWAY '{PAYMENT_GATEWAY}'")
 
 CRON_SECRET = env("CRON_SECRET")
 
