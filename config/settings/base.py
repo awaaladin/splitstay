@@ -201,7 +201,10 @@ FIELD_ENCRYPTION_KEY = env("FIELD_ENCRYPTION_KEY")  # urlsafe-base64 Fernet key
 PAYMENT_GATEWAY = env("PAYMENT_GATEWAY", "mock")
 # The Paystack account is shared with other apps. Every reference/metadata we send is tagged
 # SPLITPAY (apps/payments/naming.py) so dashboard exports can be split per product.
-PAYSTACK_SECRET_KEY = env("PAYSTACK_SECRET_KEY") or env("PAYSTACK_API", "")
+# Only the first whitespace-delimited token: a trailing "# comment" pasted into a host's env value
+# once corrupted the key, and a key never legitimately contains whitespace.
+_paystack_raw = (env("PAYSTACK_SECRET_KEY") or env("PAYSTACK_API", "")).split()
+PAYSTACK_SECRET_KEY = _paystack_raw[0] if _paystack_raw else ""
 PAYSTACK_BASE_URL = env("PAYSTACK_BASE_URL", "https://api.paystack.co")
 # Paystack's published charges, used only to ESTIMATE costs in `manage.py splitpay_report` for
 # transfers (collections record Paystack's real fee). Check them against your dashboard.
@@ -221,9 +224,9 @@ BILL_PAYMENTS_ENABLED = (BILL_PROVIDER == "vtpass" and bool(VTPASS_API_KEY and V
 )
 
 # Service fee applied at payout time: "flat" (naira) or "percent".
-SERVICE_FEE_TYPE = env("SERVICE_FEE_TYPE", "flat")
+SERVICE_FEE_TYPE = env("SERVICE_FEE_TYPE", "percent")
 SERVICE_FEE_FLAT = Decimal(env("SERVICE_FEE_FLAT", "150"))
-SERVICE_FEE_PERCENT = Decimal(env("SERVICE_FEE_PERCENT", "1.5"))
+SERVICE_FEE_PERCENT = Decimal(env("SERVICE_FEE_PERCENT", "10"))
 SERVICE_FEE_MIN = Decimal(env("SERVICE_FEE_MIN", "0"))
 SERVICE_FEE_MAX = Decimal(env("SERVICE_FEE_MAX", "0"))  # 0 = no cap
 

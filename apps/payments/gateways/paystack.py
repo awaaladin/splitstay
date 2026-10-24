@@ -100,6 +100,13 @@ class PaystackGateway(PaymentGateway):
             "source": "balance", "amount": to_kobo(amount), "recipient": recipient["recipient_code"],
             "reason": narration[:100], "reference": reference,
         })
+        if data.get("status") == "otp":
+            # Paystack is waiting for someone to type an OTP, which an API payout can never do. The
+            # transfer will not go out, so fail it clearly instead of leaving it "pending" forever.
+            return TransferResult(
+                status="failed", gateway_reference=data.get("transfer_code", ""),
+                message="Paystack requires an OTP to approve transfers. Turn off OTP for transfers in the Paystack "
+                        "dashboard (Settings, Preferences) so payouts can go out automatically.")
         status = {"success": "success", "failed": "failed", "reversed": "failed"}.get(data["status"], "pending")
         return TransferResult(status=status, gateway_reference=data.get("transfer_code", ""))
 
