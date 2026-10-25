@@ -52,10 +52,21 @@
           if (others <= 0) return 0;
           return Math.max(this.targetNumber - this.customTotal, 0) / others;
         },
-        get feeAmount() {
-          if (!this.fee) return 0;
-          return this.fee.type === 'percent' ? this.targetNumber * this.fee.percent / 100 : this.fee.flat;
+        /* The service fee for `base`: one member's payment when the fee is added on top, the whole pool when deducted. */
+        feeFor: function (base) {
+          var f = this.fee;
+          if (!f) return 0;
+          var a = f.type === 'percent' ? base * f.percent / 100 : f.flat;
+          if (f.type === 'percent') {
+            if (f.min) a = Math.max(a, f.min);
+            if (f.max) a = Math.min(a, f.max);
+          }
+          return Math.round(a * 100) / 100;
         },
+        get onTop() { return !!(this.fee && this.fee.on_top); },
+        get feeAmount() { return this.onTop ? this.feeFor(this.equalShare) : this.feeFor(this.targetNumber); },
+        get eachPays() { return this.equalShare + this.feeFor(this.equalShare); },
+        get recipientGets() { return this.onTop ? this.targetNumber : Math.max(this.targetNumber - this.feeAmount, 0); },
         money: function (n) { return '₦' + Number(n).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
       };
     });

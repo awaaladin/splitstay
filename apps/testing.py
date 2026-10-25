@@ -47,5 +47,5 @@ def pay(group, user, amount=None, *, gateway_amount=None):
     from apps.contributions.services import initiate_contribution
 
     contribution = initiate_contribution(group, user, amount)
-    payment_services.confirm_contribution(contribution.reference, paid_amount=gateway_amount or contribution.amount)
+    payment_services.confirm_contribution(contribution.reference, paid_amount=gateway_amount or contribution.charge_amount)
     return Contribution.objects.get(pk=contribution.pk)

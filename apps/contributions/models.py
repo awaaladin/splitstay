@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Sum
@@ -29,7 +31,9 @@ class ContributionQuerySet(models.QuerySet):
 class Contribution(models.Model):
     group = models.ForeignKey("groups.ContributionGroup", on_delete=models.PROTECT, related_name="contributions")
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="contributions")
-    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    amount = models.DecimalField(max_digits=14, decimal_places=2)  # credited to the group's pot
+    # SplitPay's fee, charged ON TOP of `amount` at checkout. It never enters the pot or the payout.
+    service_fee = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
     status = models.CharField(
         max_length=10, choices=ContributionStatus.choices, default=ContributionStatus.PENDING, db_index=True
     )
@@ -56,3 +60,8 @@ class Contribution(models.Model):
 
     def __str__(self):
         return f"{self.reference} {self.amount} ({self.status})"
+
+    @property
+    def charge_amount(self) -> Decimal:
+        """What the member is actually charged at checkout: their share plus SplitPay's fee."""
+        return self.amount + self.service_fee

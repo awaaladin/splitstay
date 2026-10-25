@@ -44,7 +44,7 @@ def start_checkout(contribution: Contribution) -> str:
     callback = settings.SITE_URL.rstrip("/") + reverse("web:payment_return")
     session = gateway.initialize_payment(
         reference=contribution.reference,
-        amount=contribution.amount,
+        amount=contribution.charge_amount,  # the member's share plus SplitPay's fee
         email=contribution.member.email,
         callback_url=callback,
         metadata=paystack_metadata(
@@ -52,6 +52,8 @@ def start_checkout(contribution: Contribution) -> str:
             f"Contribution to {contribution.group.name}",
             group_id=contribution.group_id,
             member_id=contribution.member_id,
+            share=str(contribution.amount),
+            service_fee=str(contribution.service_fee),
         ),
     )
     contribution.gateway = gateway.name
@@ -75,13 +77,14 @@ def confirm_contribution(reference: str, *, paid_amount: Decimal | None = None, 
             contribution.save(update_fields=["gateway_fee"])
         return ConfirmResult(contribution, False)
 
-    if paid_amount is not None and paid_amount < contribution.amount:
+    expected = contribution.charge_amount  # share + fee; only the share is credited to the group
+    if paid_amount is not None and paid_amount < expected:
         contribution.status = ContributionStatus.FAILED
         contribution.failure_reason = "Gateway reported less than the expected amount"
         contribution.needs_review = True
-        contribution.review_note = f"Expected {contribution.amount}, gateway reported {paid_amount}"
+        contribution.review_note = f"Expected {expected}, gateway reported {paid_amount}"
         contribution.save()
-        log.error("Short payment on %s: expected %s got %s", reference, contribution.amount, paid_amount)
+        log.error("Short payment on %s: expected %s got %s", reference, expected, paid_amount)
         return ConfirmResult(contribution, False)
 
     group = ContributionGroup.objects.select_for_update().get(pk=contribution.group_id)
@@ -93,8 +96,8 @@ def confirm_contribution(reference: str, *, paid_amount: Decimal | None = None, 
     if gateway_fee is not None:
         contribution.gateway_fee = gateway_fee
     notes = []
-    if paid_amount is not None and paid_amount > contribution.amount:
-        notes.append(f"Gateway reported {paid_amount}; credited {contribution.amount}")
+    if paid_amount is not None and paid_amount > expected:
+        notes.append(f"Gateway reported {paid_amount}; expected {expected}; credited {contribution.amount}")
     if not group.is_open_for_contributions:
         notes.append(f"Arrived after the group was {group.get_status_display().lower()}")
     membership = group.memberships.filter(user_id=contribution.member_id).first()

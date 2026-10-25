@@ -67,7 +67,7 @@
           {% endif %}
           <div class="border-t border-line pt-3">
             <dt class="meta">Service fee</dt>
-            <dd class="text-meta text-muted">A small fee is deducted at payout and shown as its own line in the ledger. It never appears as a hidden deduction.</dd>
+            <dd class="text-meta text-muted">{% if fee_on_top %}Each person adds a small service fee when they pay, shown as its own line in the ledger. The recipient receives the full amount.{% else %}A small fee is deducted at payout and shown as its own line in the ledger.{% endif %}</dd>
           </div>
           {% if group.allow_partial_payout %}
             <div><dt class="meta">Early payout</dt><dd class="text-meta text-muted">The admin may pay out before the target is reached.</dd></div>

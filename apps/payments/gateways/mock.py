@@ -19,7 +19,7 @@ class MockGateway(PaymentGateway):
 
         contribution = Contribution.objects.filter(reference=reference).first()
         if contribution and contribution.status == "paid":
-            return ChargeVerification("success", contribution.amount, f"mock-{reference}")
+            return ChargeVerification("success", contribution.charge_amount, f"mock-{reference}")
         return ChargeVerification("pending")
 
     def verify_webhook_signature(self, raw_body, headers):

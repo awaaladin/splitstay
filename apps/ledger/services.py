@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
 
+from django.db.models import Sum
+
 from apps.contributions.models import Contribution, ContributionStatus
 from apps.contributions.selectors import paid_totals_by_member, progress
 from apps.groups.models import ContributionGroup, PayoutType
@@ -37,6 +39,13 @@ def group_entries(group: ContributionGroup, *, user=None) -> list[Entry]:
             amount=c.amount, status=c.status, actor=c.member.display_name, reference=c.reference,
             detail={"member_id": c.member_id, "needs_review": c.needs_review},
         ))
+        if c.status == ContributionStatus.PAID and c.service_fee:
+            # The fee is its own line: paid by the member on top of their share, never taken from the pot.
+            entries.append(Entry(
+                at=c.paid_at or c.created_at, kind="fee", title="Service fee", amount=c.service_fee,
+                status="applied", actor=c.member.display_name, reference=c.reference,
+                detail={"on_top": True, "member_id": c.member_id},
+            ))
     if user is not None:
         return sorted(entries, key=lambda e: e.at, reverse=True)
 
@@ -85,6 +94,9 @@ def group_summary(group: ContributionGroup) -> dict:
     data = progress(group)
     record = getattr(group, "bill_payment" if group.payout_type == PayoutType.BILL_PAYMENT else "payout", None)
     data["payout_status"] = record.status if record else None
-    data["fee"] = record.fee_amount if record else None
+    # Fees paid by members on top of their shares, plus anything deducted at payout (legacy mode).
+    on_top = group.contributions.filter(status=ContributionStatus.PAID).aggregate(t=Sum("service_fee"))["t"] or Decimal("0.00")
+    deducted = record.fee_amount if record else Decimal("0.00")
+    data["fee"] = (on_top + deducted) if (record or on_top) else None
     data["net"] = record.net_amount if record else None
     return data

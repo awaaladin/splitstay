@@ -11,11 +11,18 @@
   {% endif %}
 
   {% if can_pay %}
-    <form method="post" action="{% url 'web:group_pay' group.pk %}" class="mt-5" data-busy>
+    {% if pay_fee %}
+    <dl class="mt-4 space-y-1.5 rounded-md bg-sunken px-3 py-2.5 text-meta">
+      <div class="flex justify-between"><dt class="text-muted">Your share (goes to the group)</dt><dd class="amount text-fg">{{ my_row.outstanding|naira }}</dd></div>
+      <div class="flex justify-between"><dt class="text-muted">SplitPay service fee</dt><dd class="amount text-fg">{{ pay_fee|naira }}</dd></div>
+      <div class="flex justify-between border-t border-line pt-1.5 font-semibold"><dt class="text-fg">You pay today</dt><dd class="amount text-fg">{{ pay_total|naira }}</dd></div>
+    </dl>
+    {% endif %}
+    <form method="post" action="{% url 'web:group_pay' group.pk %}" class="mt-4" data-busy>
       {% csrf_token %}
-      <button type="submit" class="btn-primary btn-block">{% icon "wallet" 18 %} Pay {{ my_row.outstanding|naira }}</button>
+      <button type="submit" class="btn-primary btn-block">{% icon "wallet" 18 %} Pay {{ pay_total|naira }}</button>
     </form>
-    <p class="hint">You'll pay securely through the payment gateway and come straight back here.</p>
+    <p class="hint">You'll pay securely through the payment gateway and come straight back here.{% if pay_fee %} The recipient receives your full share; the fee is ours.{% endif %}</p>
   {% elif my_row and my_row.outstanding == 0 and my_row.share > 0 %}
     <p class="mt-5 flex items-center gap-2 rounded-md bg-ok-soft px-3 py-2.5 text-body text-ok">{% icon "check" 18 %} Your share is paid in full.</p>
   {% endif %}
@@ -43,7 +50,7 @@
     <div class="mt-5 border-t border-line pt-5">
       <p class="eyebrow">Admin</p>
       <button type="button" class="btn-secondary btn-block mt-2"
-        @click="$dispatch('confirm', { action: '{% url 'web:group_payout' group.pk %}', title: 'Pay out before the target is reached?', body: 'Only {{ progress.funded|naira }} of {{ progress.target|naira }} has been collected. The group closes to new contributions and the service fee is deducted from what has been collected.', confirmLabel: 'Pay out now' })">
+        @click="$dispatch('confirm', { action: '{% url 'web:group_payout' group.pk %}', title: 'Pay out before the target is reached?', body: 'Only {{ progress.funded|naira }} of {{ progress.target|naira }} has been collected. The group closes to new contributions and what has been collected is paid out{% if fee_on_top %} in full{% else %} after the service fee{% endif %}.', confirmLabel: 'Pay out now' })">
         {% icon "banknote" 18 %} Pay out {{ progress.funded|naira }} now
       </button>
     </div>

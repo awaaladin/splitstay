@@ -224,9 +224,13 @@ BILL_PAYMENTS_ENABLED = (BILL_PROVIDER == "vtpass" and bool(VTPASS_API_KEY and V
 )
 
 # Service fee applied at payout time: "flat" (naira) or "percent".
+# SERVICE_FEE_MODE "on_top": each member's payment carries the fee, so the recipient gets the full pool.
+# "deduct": the fee is taken out of the pool at payout (the recipient gets less).
+# In on_top mode SERVICE_FEE_FLAT/PERCENT/MIN/MAX apply to each payment; in deduct mode to the whole pool.
+SERVICE_FEE_MODE = env("SERVICE_FEE_MODE", "on_top")
 SERVICE_FEE_TYPE = env("SERVICE_FEE_TYPE", "percent")
 SERVICE_FEE_FLAT = Decimal(env("SERVICE_FEE_FLAT", "150"))
-SERVICE_FEE_PERCENT = Decimal(env("SERVICE_FEE_PERCENT", "10"))
+SERVICE_FEE_PERCENT = Decimal(env("SERVICE_FEE_PERCENT", "5"))
 SERVICE_FEE_MIN = Decimal(env("SERVICE_FEE_MIN", "0"))
 SERVICE_FEE_MAX = Decimal(env("SERVICE_FEE_MAX", "0"))  # 0 = no cap
 

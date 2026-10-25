@@ -7,7 +7,8 @@
 Everything here comes from SplitPay's own records, so it covers only SplitPay's references
 (SPLITPAY-... / splitpay-...), however many other apps share the Paystack account.
 
-  Revenue  = SplitPay service fees on payouts that actually went out.
+  Revenue  = service fees members paid on top of their shares (counted when the payment is confirmed)
+             plus any fee deducted from a payout that actually went out (legacy "deduct" mode).
   Costs    = Paystack's charge on each collection (recorded from Paystack, exact) plus the transfer
              fee on each payout (ESTIMATED from Paystack's published tiers in settings).
   Held     = member money collected but not yet paid out. It is NOT revenue.
@@ -69,12 +70,14 @@ class Command(BaseCommand):
             return qs
 
         paid = within(Contribution.objects.filter(status=ContributionStatus.PAID), "paid_at")
-        collected = paid.aggregate(total=Sum("amount"), fees=Sum("gateway_fee"), n=Count("id"))
+        collected = paid.aggregate(total=Sum("amount"), fees=Sum("gateway_fee"), on_top=Sum("service_fee"), n=Count("id"))
         unknown_fee_rows = paid.filter(gateway_fee__isnull=True).count()
 
         done_payouts = list(within(Payout.objects.filter(status=PayoutStatus.COMPLETED), "completed_at"))
         done_bills = list(within(BillPayment.objects.filter(status=PayoutStatus.COMPLETED), "completed_at"))
-        revenue = sum((r.fee_amount for r in done_payouts + done_bills), ZERO)
+        revenue_on_top = collected["on_top"] or ZERO
+        revenue_deducted = sum((r.fee_amount for r in done_payouts + done_bills), ZERO)
+        revenue = revenue_on_top + revenue_deducted
         transfer_costs = sum((transfer_fee(p.net_amount) for p in done_payouts), ZERO)
         paid_out = sum((r.net_amount for r in done_payouts + done_bills), ZERO)
 
@@ -94,10 +97,10 @@ class Command(BaseCommand):
         out = self.stdout.write
         out(f"SplitPay profit & loss ({window})")
         out("-" * 58)
-        out(f"Collected from members    {naira(collected['total']):>18}   ({collected['n']} payments)")
+        out(f"Collected from members    {naira(collected['total']):>18}   ({collected['n']} payments, the pooled shares)")
         out(f"Paid out to recipients    {naira(paid_out):>18}   ({len(done_payouts)} transfers, {len(done_bills)} bills)")
         out("")
-        out(f"Revenue: service fees     {naira(revenue):>18}")
+        out(f"Revenue: service fees     {naira(revenue):>18}   ({naira(revenue_on_top)} on top of payments, {naira(revenue_deducted)} deducted at payout)")
         out(f"Cost: Paystack collection {naira(collection_costs):>18}   (actual, from Paystack)")
         out(f"Cost: Paystack transfers  {naira(transfer_costs):>18}   (estimated from published tiers)")
         label = "PROFIT" if profit >= 0 else "LOSS  "
@@ -115,7 +118,8 @@ class Command(BaseCommand):
                 w = csv.writer(fh)
                 w.writerow(["type", "reference", "group", "date", "amount", "service_fee", "paystack_fee", "status"])
                 for c in paid.select_related("group"):
-                    w.writerow(["collection", c.reference, c.group.name, c.paid_at.date(), c.amount, "", c.gateway_fee or "", c.status])
+                    w.writerow(["collection", c.reference, c.group.name, c.paid_at.date(), c.amount, c.service_fee or "",
+                                c.gateway_fee or "", c.status])
                 for p in done_payouts:
                     w.writerow(["transfer", p.reference, p.group.name, p.completed_at.date(), p.net_amount, p.fee_amount,
                                 transfer_fee(p.net_amount), p.status])

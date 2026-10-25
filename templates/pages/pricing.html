@@ -1,36 +1,54 @@
 {% extends "base.html" %}
 {% load static cp %}
 {% block title %}Fees · SplitPay{% endblock %}
-{% block description %}Free to start. One small, itemised fee when the money goes out.{% endblock %}
+{% block description %}Free to start. One small, itemised service fee on each payment, shown before you pay.{% endblock %}
 {% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}</style></noscript>{% endblock %}
 {% block main_class %}{% endblock %}
 {% block content %}
 <section class="py-16 sm:py-24">
   <div class="page">
     <p class="reveal eyebrow">Fees</p>
-    <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">Free until the money goes out. Then one line.</h1>
-    <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">Creating a group, inviting people and paying your share costs nothing with us. When a group is paid out, SplitPay takes one fee from the pooled money. It is shown in the group summary before you start, and as its own entry on the ledger and the receipt afterwards.</p>
+    {% if fee.on_top %}
+      <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">One small fee, on top. The recipient gets every naira.</h1>
+      <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">Creating a group and inviting people is free. When you pay your share, SplitPay adds a small service fee to that payment. You see the exact total before you pay, and the fee appears as its own line on the ledger and your confirmation. Nothing is taken out of the landlord's rent or the bill: the recipient receives the full amount the group collected.</p>
+    {% else %}
+      <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">Free until the money goes out. Then one line.</h1>
+      <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">Creating a group, inviting people and paying your share costs nothing with us. When a group is paid out, SplitPay takes one fee from the pooled money. It is shown in the group summary before you start, and as its own entry on the ledger and the receipt afterwards.</p>
+    {% endif %}
 
     <div class="mt-12 grid gap-6 lg:grid-cols-12 [&>*]:min-w-0">
       <div class="spot reveal p-6 sm:p-7 lg:col-span-4" data-spot>
         <p class="eyebrow">Current service fee</p>
         {% if fee.type == 'percent' %}
           <p class="amount mt-3 text-display text-fg">{{ fee.percent|floatformat:"-2" }}%</p>
-          <p class="mt-1 text-body text-muted">of the amount paid out</p>
+          <p class="mt-1 text-body text-muted">{% if fee.on_top %}added to each payment{% else %}of the amount paid out{% endif %}</p>
         {% else %}
           <p class="amount mt-3 text-display text-fg">{{ fee.flat|naira_short }}</p>
-          <p class="mt-1 text-body text-muted">flat, per payout. Not per person.</p>
+          <p class="mt-1 text-body text-muted">{% if fee.on_top %}added to each payment{% else %}flat, per payout. Not per person.{% endif %}</p>
         {% endif %}
         <ul class="mt-6 space-y-2.5 border-t border-line pt-5 text-body text-muted">
           <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Creating and joining groups: free</li>
-          <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Paying your share: free</li>
           <li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} Receipts and ledger: free</li>
-          <li class="flex gap-2.5">{% icon "info" 18 "mt-0.5 text-primary flex-none" %} The payment company (Paystack) may add its own card or transfer charge at checkout, which is shown there.</li>
+          {% if fee.on_top %}<li class="flex gap-2.5">{% icon "check" 18 "mt-0.5 text-ok flex-none" %} The total is shown before you pay</li>{% endif %}
+          <li class="flex gap-2.5">{% icon "info" 18 "mt-0.5 text-primary flex-none" %} Our fee already covers the card and bank charges of our payment company (Paystack). You won't see a second charge.</li>
         </ul>
       </div>
 
       <div class="reveal lg:col-span-8" style="--d:120ms">
         <div class="card overflow-hidden">
+          {% if fee.on_top %}
+          <div class="border-b border-line px-6 py-4"><h2 class="section-title">What one person pays</h2><p class="meta mt-0.5">Worked out from the live fee setting.</p></div>
+          <div class="overflow-x-auto">
+          <table class="w-full text-left text-body">
+            <thead><tr class="table-head border-b border-line"><th class="px-4 py-3 font-semibold sm:px-6">Your share</th><th class="px-2 py-3 font-semibold sm:px-3">Fee added</th><th class="px-4 py-3 text-right font-semibold sm:px-6">You pay</th></tr></thead>
+            <tbody class="divide-line">
+              {% for e in examples %}
+              <tr class="border-b border-line last:border-0"><td class="amount whitespace-nowrap px-4 py-4 sm:px-6">{{ e.share|naira_short }}</td><td class="amount whitespace-nowrap px-2 py-4 text-muted sm:px-3">+{{ e.fee|naira_short }}</td><td class="amount whitespace-nowrap px-4 py-4 text-right sm:px-6">{{ e.total|naira }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          </div>
+          {% else %}
           <div class="border-b border-line px-6 py-4"><h2 class="section-title">What it looks like in practice</h2><p class="meta mt-0.5">Worked out from the live fee setting.</p></div>
           <div class="overflow-x-auto">
           <table class="w-full text-left text-body">
@@ -42,8 +60,13 @@
             </tbody>
           </table>
           </div>
+          {% endif %}
         </div>
+        {% if fee.on_top %}
+        <div class="alert-info mt-5">{% icon "info" 20 "mt-0.5 flex-none text-primary" %}<p><b class="font-semibold">An example.</b> Four friends each owe ₦150,000 toward a ₦600,000 rent. Each pays {{ examples.4.total|naira }} at checkout, ₦150,000 of which goes to the group. The landlord receives the full ₦600,000.</p></div>
+        {% else %}
         <div class="alert-info mt-5">{% icon "info" 20 "mt-0.5 flex-none text-primary" %}<p><b class="font-semibold">Covering a bill exactly?</b> The fee comes out of the pool, so set the target a little above the bill. The group form shows the fee and the net amount as you type.</p></div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -51,8 +74,13 @@
 
 <section class="force-dark border-t border-line py-16">
   <div class="page grid gap-8 md:grid-cols-3">
+    {% if fee.on_top %}
+    <div><h3 class="text-section">The recipient gets the full amount</h3><p class="mt-2 text-body text-muted">The fee rides on each payment. It never reduces the rent, the bill or the family transfer the group is collecting for.</p></div>
+    <div><h3 class="text-section">Shown before you pay</h3><p class="mt-2 text-body text-muted">Your share, the fee and the total are listed on the group page and at checkout, and recorded as separate lines on the ledger.</p></div>
+    {% else %}
     <div><h3 class="text-section">No hidden deductions</h3><p class="mt-2 text-body text-muted">The fee is recorded as a separate entry, never subtracted silently from someone's share.</p></div>
-    <div><h3 class="text-section">No fee on failure</h3><p class="mt-2 text-body text-muted">If a payment to a bill or bank fails, your money stays in the pot and the admin can retry. The fee is part of the payout record, not a charge on top.</p></div>
+    <div><h3 class="text-section">Shown up front</h3><p class="mt-2 text-body text-muted">The group form shows the fee and what the recipient will get before the group is created.</p></div>
+    {% endif %}
     <div><h3 class="text-section">No lending, no interest</h3><p class="mt-2 text-body text-muted">We never advance money on anyone's behalf, so there is nothing to charge interest on.</p></div>
   </div>
 </section>

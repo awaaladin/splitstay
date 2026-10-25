@@ -13,9 +13,13 @@
     </div>
     <div class="confirm-rise">
       <h1 class="page-title mt-5">Payment confirmed</h1>
-      <p class="amount mt-2 text-figure text-fg">{{ contribution.amount|naira }}</p>
-      <p class="mt-1 text-body text-muted">toward <a class="font-medium text-fg hover:underline" href="{% url 'web:group_detail' group.pk %}">{{ group.name }}</a></p>
+      <p class="amount mt-2 text-figure text-fg">{{ contribution.charge_amount|naira }}</p>
+      <p class="mt-1 text-body text-muted">paid for <a class="font-medium text-fg hover:underline" href="{% url 'web:group_detail' group.pk %}">{{ group.name }}</a></p>
       <dl class="mx-auto mt-6 max-w-xs space-y-2 border-t border-line pt-5 text-left">
+        {% if contribution.service_fee %}
+        <div class="flex justify-between gap-4"><dt class="meta">Your share (to the group)</dt><dd class="amount text-meta">{{ contribution.amount|naira }}</dd></div>
+        <div class="flex justify-between gap-4"><dt class="meta">SplitPay service fee</dt><dd class="amount text-meta">{{ contribution.service_fee|naira }}</dd></div>
+        {% endif %}
         <div class="flex justify-between gap-4"><dt class="meta">Reference</dt><dd class="receipt-mono text-meta">{{ contribution.reference }}</dd></div>
         <div class="flex justify-between gap-4"><dt class="meta">Time</dt><dd class="tnum text-meta">{{ contribution.paid_at|date:"j M Y, g:i a" }}</dd></div>
         <div class="flex justify-between gap-4"><dt class="meta">Group is now</dt><dd class="tnum text-meta">{{ group.percent_funded }}% funded</dd></div>

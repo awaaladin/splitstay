@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200" fill="none">
+  <title>SplitPay</title>
+  <defs><clipPath id="vessel"><rect x="4" y="4" width="24" height="24" rx="7"/></clipPath></defs>
+  <g transform="translate(20 20) scale(5)">
+    <g clip-path="url(#vessel)"><path d="M4 13 q4 -3 8 0 t8 0 t8 0 V28 H4 Z" fill="#102a56" opacity="0.92"/></g>
+    <rect x="4" y="4" width="24" height="24" rx="7" stroke="#102a56" stroke-width="2"/>
+  </g>
+  <text x="205" y="124" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="88" font-weight="600" letter-spacing="-2"><tspan fill="#2a2f3d">Split</tspan><tspan fill="#102a56">Pay</tspan></text>
+</svg>

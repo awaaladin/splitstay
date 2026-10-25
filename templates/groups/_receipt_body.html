@@ -67,12 +67,13 @@
       <div class="receipt-rule mt-5"></div>
 
       <dl class="receipt-line mt-5 space-y-2 text-body" style="--i:10">
-        <div class="flex justify-between"><dt class="meta">Total collected</dt><dd class="amount">{{ record.gross_amount|naira }}</dd></div>
+        <div class="flex justify-between"><dt class="meta">Pooled by members</dt><dd class="amount">{{ record.gross_amount|naira }}</dd></div>
         {% for fee in fees %}
         <div class="flex justify-between"><dt class="meta">{{ fee.description }}{% if fee.fee_type == 'percent' %} ({{ fee.rate|floatformat:"-2" }}%){% endif %}</dt><dd class="amount text-muted">−{{ fee.amount|naira }}</dd></div>
         {% endfor %}
         <div class="flex flex-wrap items-baseline justify-between gap-x-4 border-t border-line-strong pt-3"><dt class="text-body font-semibold">Amount paid{% if is_bill %} to biller{% endif %}</dt><dd class="amount text-[1.625rem] leading-9 text-fg sm:text-figure">{{ record.net_amount|naira }}</dd></div>
       </dl>
+      {% if fees_on_top %}<p class="receipt-line mt-4 text-meta text-muted" style="--i:11">Members also paid <span class="amount text-fg">{{ fees_on_top|naira }}</span> in SplitPay service fees on top of their shares. That fee is not taken from the amount above.</p>{% endif %}
       {% if record.is_partial %}<p class="receipt-line mt-4 text-meta text-muted" style="--i:11">Paid out early at the admin's request, before the {{ group.target_amount|naira }} target was reached.</p>{% endif %}
 
       <p class="receipt-line mt-7 text-center text-micro normal-case tracking-normal text-muted" style="--i:12">Issued by SplitPay. The full history of this group is in its ledger.</p>

@@ -12,9 +12,9 @@
     {% else %}{% icon "landmark" 16 %}{% endif %}
   </span>
   <div class="min-w-0 flex-1">
-    <p class="text-body font-medium">{{ e.title }}{% if e.kind == 'contribution' %} <span class="font-normal text-muted">by {{ e.actor }}</span>{% endif %}</p>
+    <p class="text-body font-medium">{{ e.title }}{% if e.kind == 'contribution' or e.detail.on_top %} <span class="font-normal text-muted">{% if e.detail.on_top %}paid by {{ e.actor }} on top of their share{% else %}by {{ e.actor }}{% endif %}</span>{% endif %}</p>
     <p class="meta tnum">{{ e.at|date:"j M Y, g:i a" }}
-      {% if e.kind == 'fee' %} · {% if e.detail.fee_type == 'percent' %}{{ e.detail.rate }}% of the pool{% else %}flat fee{% endif %}, deducted before payment{% endif %}
+      {% if e.kind == 'fee' and not e.detail.on_top %} · {% if e.detail.fee_type == 'percent' %}{{ e.detail.rate }}% of the pool{% else %}flat fee{% endif %}, deducted before payment{% endif %}
       {% if e.detail.token %} · token <span class="receipt-mono text-fg">{{ e.detail.token }}</span>{% endif %}
       {% if e.detail.account %} · {{ e.detail.account }}{% endif %}
     </p>
@@ -22,7 +22,7 @@
   </div>
   <div class="flex-none text-right">
     <p class="amount text-body {% if e.kind == 'fee' or e.kind == 'payout' or e.kind == 'bill_payment' %}text-muted{% else %}text-fg{% endif %}">
-      {% if e.kind == 'contribution' and e.status == 'paid' %}+{% elif e.kind != 'contribution' %}−{% endif %}{{ e.amount|naira }}
+      {% if e.detail.on_top %}{% elif e.kind == 'contribution' and e.status == 'paid' %}+{% elif e.kind != 'contribution' %}−{% endif %}{{ e.amount|naira }}
     </p>
     {% if e.kind == 'payout' or e.kind == 'bill_payment' %}<span class="mt-0.5 inline-block">{% status_badge "payout" e.status %}</span>
     {% elif e.status == 'failed' %}<span class="mt-0.5 inline-block">{% status_badge "contribution" "failed" %}</span>{% endif %}

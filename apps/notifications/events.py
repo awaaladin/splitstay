@@ -53,10 +53,13 @@ def group_overdue(group):
 
 def payout_completed(group, record):
     what = "The bill was paid" if hasattr(record, "service_id") else "The transfer was sent"
+    if record.fee_amount:
+        detail = f"{what} ({naira(record.net_amount)} after a {naira(record.fee_amount)} service fee). "
+    else:
+        detail = f"{what}: {naira(record.net_amount)}, the full amount. "
     for user in _audience(group):
         notify(user, Kind.PAYOUT_DONE, f"{group.name}: payment complete",
-               f"{what} ({naira(record.net_amount)} after a {naira(record.fee_amount)} service fee). "
-               "The receipt is on the group page.",
+               detail + "The receipt is on the group page.",
                group=group, dedupe_key=f"payout_done:{record.reference}:{user.pk}")
 
 

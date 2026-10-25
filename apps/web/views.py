@@ -29,6 +29,7 @@ from apps.notifications.models import Notification
 from apps.payments import services as payment_services
 from apps.payments.gateways import GatewayError
 from apps.payouts import services as payout_services
+from apps.payouts.fees import fee_for_payment, fees_on_top
 
 from .forms import BankAccountForm, GroupForm, InviteForm, LoginForm, ProfileForm, RegisterForm
 
@@ -91,9 +92,12 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
         group.is_open_for_contributions and membership and membership.status == MembershipStatus.JOINED
         and my_row and my_row["outstanding"] > 0
     )
+    # What "Pay" will actually charge: the member's outstanding share plus SplitPay's fee on top.
+    pay_fee = fee_for_payment(my_row["outstanding"]).amount if can_pay else Decimal("0.00")
     ctx.update(
         progress=prog, **pot_geometry(prog, initial), rows=rows, my_row=my_row,
         entries=ledger.group_entries(group)[:10], record=record, is_bill=is_bill,
+        pay_fee=pay_fee, pay_total=(my_row["outstanding"] + pay_fee) if can_pay else Decimal("0.00"),
         contributors=sum(1 for r in rows if r["paid"] > 0), can_pay=can_pay,
         can_partial_payout=bool(
             is_admin and group.allow_partial_payout and group.is_open_for_contributions
@@ -103,7 +107,7 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
         can_edit=is_admin and group.is_open_for_contributions,
         can_manage_members=is_admin and group.is_open_for_contributions and prog["funded"] == 0,
         can_cancel=is_admin and group.status in (GroupStatus.OPEN, GroupStatus.OVERDUE) and prog["funded"] == 0,
-        invite_form=InviteForm(),
+        invite_form=InviteForm(), fee_on_top=fees_on_top(),
         needs_review=group.contributions.filter(needs_review=True).exists() if is_admin else False,
     )
     return ctx
@@ -114,12 +118,12 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
 def landing(request):
     if request.user.is_authenticated:
         return redirect("web:dashboard")
-    return render(request, "landing.html")
+    return render(request, "landing.html", {"fee": _fee_policy()})
 
 
 def guide(request):
     """The complete start-to-finish user guide. Public, and also linked from the signed-in nav."""
-    return render(request, "guide.html")
+    return render(request, "guide.html", {"fee": _fee_policy()})
 
 
 def about(request):
@@ -131,9 +135,15 @@ def pricing(request):
     from apps.payouts.fees import quote_fee
 
     examples = []
-    for pool in (Decimal("30000"), Decimal("150000"), Decimal("600000")):
-        quote = quote_fee(pool)
-        examples.append({"pool": pool, "fee": quote.amount, "net": quote.net(pool)})
+    if fees_on_top():
+        # One person's share -> the fee added at checkout -> what they pay. The recipient gets the full pool.
+        for share in (Decimal("2000"), Decimal("5000"), Decimal("10000"), Decimal("37500"), Decimal("150000")):
+            fee = fee_for_payment(share).amount
+            examples.append({"share": share, "fee": fee, "total": share + fee})
+    else:
+        for pool in (Decimal("30000"), Decimal("150000"), Decimal("600000")):
+            quote = quote_fee(pool)
+            examples.append({"pool": pool, "fee": quote.amount, "net": quote.net(pool)})
     return render(request, "pages/pricing.html", {"fee": _fee_policy(), "examples": examples})
 
 
@@ -320,7 +330,9 @@ def group_new(request):
 
 def _fee_policy() -> dict:
     return {
-        "type": settings.SERVICE_FEE_TYPE, "flat": settings.SERVICE_FEE_FLAT, "percent": settings.SERVICE_FEE_PERCENT,
+        "mode": settings.SERVICE_FEE_MODE, "on_top": fees_on_top(), "type": settings.SERVICE_FEE_TYPE,
+        "flat": settings.SERVICE_FEE_FLAT, "percent": settings.SERVICE_FEE_PERCENT,
+        "min": settings.SERVICE_FEE_MIN, "max": settings.SERVICE_FEE_MAX,
     }
 
 
@@ -540,7 +552,7 @@ def mock_checkout(request, reference):
             if request.POST.get("outcome") == "decline":
                 payment_services.fail_contribution(reference, "Declined at checkout")
             else:
-                payment_services.confirm_contribution(reference, paid_amount=contribution.amount, gateway_reference=f"mock-{reference}")
+                payment_services.confirm_contribution(reference, paid_amount=contribution.charge_amount, gateway_reference=f"mock-{reference}")
         return redirect("web:contribution_confirmation", reference=reference)
     return render(request, "payments/mock_checkout.html", {"contribution": contribution, "group": contribution.group})
 
@@ -557,6 +569,8 @@ def group_receipt(request, pk):
     ctx = {
         "group": group, "record": record, "is_bill": group.payout_type == PayoutType.BILL_PAYMENT,
         "contributions": paid, "fees": record.fees.all(), "is_admin": group.admin_id == request.user.pk,
+        # Fees members paid on top of their shares (not deducted from what the recipient receives).
+        "fees_on_top": sum((c.service_fee for c in paid), Decimal("0.00")),
     }
     if is_htmx(request):
         return render(request, "groups/_receipt_body.html", ctx)

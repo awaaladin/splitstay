@@ -66,7 +66,8 @@ def request_payout(group: ContributionGroup, *, triggered_by=None, partial: bool
             service_id=group.bill_service_id, customer_id=group.bill_customer_id,
             variation=group.bill_variation, is_partial=is_partial, triggered_by=triggered_by,
         )
-        Fee.objects.create(bill_payment=record, fee_type=quote.fee_type, rate=quote.rate, amount=quote.amount)
+        if quote.amount:  # none in on_top mode: the fee was already paid on each contribution
+            Fee.objects.create(bill_payment=record, fee_type=quote.fee_type, rate=quote.rate, amount=quote.amount)
         _schedule("bill", record.pk)
     else:
         record = Payout.objects.create(
@@ -77,7 +78,8 @@ def request_payout(group: ContributionGroup, *, triggered_by=None, partial: bool
             recipient_account_last4=(group.recipient_account_number or "")[-4:],
             is_partial=is_partial, triggered_by=triggered_by,
         )
-        Fee.objects.create(payout=record, fee_type=quote.fee_type, rate=quote.rate, amount=quote.amount)
+        if quote.amount:
+            Fee.objects.create(payout=record, fee_type=quote.fee_type, rate=quote.rate, amount=quote.amount)
         _schedule("transfer", record.pk)
     return record
 

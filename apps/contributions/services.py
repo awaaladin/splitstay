@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.groups.models import ContributionGroup, MembershipStatus
+from apps.payouts.fees import fee_for_payment
 
 from .models import Contribution, ContributionStatus
 
@@ -35,6 +36,8 @@ def initiate_contribution(group: ContributionGroup, user, amount=None) -> Contri
     if amount > outstanding:
         raise ValidationError(f"That is more than your outstanding share of ₦{outstanding:,.2f}.")
 
+    fee = fee_for_payment(amount).amount  # added on top; never part of the share or the pot
+
     # Re-clicking "Pay" shouldn't leave a trail of duplicate pending rows.
     existing = (
         Contribution.objects.filter(
@@ -48,5 +51,10 @@ def initiate_contribution(group: ContributionGroup, user, amount=None) -> Contri
         .first()
     )
     if existing:
+        if existing.service_fee != fee:
+            # The fee policy changed since this checkout was created: never reuse a stale charge.
+            existing.service_fee = fee
+            existing.checkout_url = ""
+            existing.save(update_fields=["service_fee", "checkout_url"])
         return existing
-    return Contribution.objects.create(group=group, member=user, amount=amount)
+    return Contribution.objects.create(group=group, member=user, amount=amount, service_fee=fee)

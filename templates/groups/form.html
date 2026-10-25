@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load cp %}
+{% load cp l10n %}
 {% block title %}{% if editing %}Edit {{ editing.name }}{% else %}New group{% endif %} · SplitPay{% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
     members: JSON.parse(document.getElementById('gf-members').textContent),
     editing: {{ editing|yesno:'true,false' }},
     billEnabled: {{ bill_enabled|yesno:'true,false' }},
-    fee: { type: '{{ fee.type }}', flat: {{ fee.flat }}, percent: {{ fee.percent }} }
+    fee: { type: '{{ fee.type }}', on_top: {{ fee.on_top|yesno:'true,false' }}, flat: {{ fee.flat|unlocalize }}, percent: {{ fee.percent|unlocalize }}, min: {{ fee.min|unlocalize }}, max: {{ fee.max|unlocalize }} }
   })">
 
   <a href="{% if editing %}{% url 'web:group_detail' editing.pk %}{% else %}{% url 'web:dashboard' %}{% endif %}" class="btn-quiet btn-sm -ml-3 mb-4 inline-flex">{% icon "arrow-left" 16 %} Back</a>
@@ -172,10 +172,12 @@
           <div class="flex items-baseline justify-between"><dt class="meta">People</dt><dd class="amount" x-text="headcount"></dd></div>
           <div class="flex items-baseline justify-between"><dt class="meta">Equal share</dt><dd class="amount" x-text="money(equalShare)"></dd></div>
           {% endif %}
-          <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="meta">Service fee at payout</dt><dd class="amount text-muted" x-text="money(feeAmount)"></dd></div>
-          <div class="flex items-baseline justify-between"><dt class="meta font-medium text-fg" x-text="payoutType === 'bill_payment' ? 'Paid to the biller' : 'Sent to the recipient'"></dt><dd class="amount text-lead" x-text="money(Math.max(targetNumber - feeAmount, 0))"></dd></div>
+          <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="meta" x-text="onTop ? 'Service fee on each equal share' : 'Service fee at payout'"></dt><dd class="amount text-muted" x-text="money(feeAmount)"></dd></div>
+          <div class="flex items-baseline justify-between" x-show="onTop"><dt class="meta">Each person pays</dt><dd class="amount" x-text="money(eachPays)"></dd></div>
+          <div class="flex items-baseline justify-between"><dt class="meta font-medium text-fg" x-text="payoutType === 'bill_payment' ? 'Paid to the biller' : 'Sent to the recipient'"></dt><dd class="amount text-lead" x-text="money(recipientGets)"></dd></div>
         </dl>
-        <p class="hint mt-4">The fee comes out of the pooled amount, so the recipient gets less than the target. To cover a bill in full, raise the target until "Sent to the recipient" matches it.</p>
+        <p class="hint mt-4" x-show="onTop">Each person adds a small service fee when they pay, so the recipient gets the whole target. The fee is shown to them before they pay.</p>
+        <p class="hint mt-4" x-show="!onTop">The fee comes out of the pooled amount, so the recipient gets less than the target. To cover a bill in full, raise the target until "Sent to the recipient" matches it.</p>
         <p class="mt-3 text-meta text-warn" x-show="customTotal > targetNumber && targetNumber > 0" x-cloak>Custom shares add up to more than the target.</p>
       </section>
     </aside>

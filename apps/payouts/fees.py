@@ -15,13 +15,19 @@ class FeeQuote:
         return gross - self.amount
 
 
-def quote_fee(gross: Decimal) -> FeeQuote:
-    """Compute the service fee for a payout of `gross` from the configured policy."""
-    gross = Decimal(gross)
+KOBO = Decimal("0.01")
+
+
+def fees_on_top() -> bool:
+    return settings.SERVICE_FEE_MODE == "on_top"
+
+
+def _policy_fee(base: Decimal) -> FeeQuote:
+    """The configured fee for `base` (a whole pool in deduct mode, one member's payment in on_top mode)."""
     kind = settings.SERVICE_FEE_TYPE
     if kind == "percent":
         rate = Decimal(settings.SERVICE_FEE_PERCENT)
-        amount = (gross * rate / 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        amount = (base * rate / 100).quantize(KOBO, rounding=ROUND_HALF_UP)
         minimum, maximum = Decimal(settings.SERVICE_FEE_MIN), Decimal(settings.SERVICE_FEE_MAX)
         if minimum:
             amount = max(amount, minimum)
@@ -30,9 +36,26 @@ def quote_fee(gross: Decimal) -> FeeQuote:
     else:
         kind = "flat"
         rate = Decimal(settings.SERVICE_FEE_FLAT)
-        amount = rate.quantize(Decimal("0.01"))
-    if amount >= gross:
-        raise ValidationError(
-            f"The pooled amount (₦{gross:,.2f}) does not cover the service fee (₦{amount:,.2f})."
-        )
+        amount = rate.quantize(KOBO)
     return FeeQuote(fee_type=kind, rate=rate, amount=amount)
+
+
+def fee_for_payment(amount: Decimal) -> FeeQuote:
+    """The fee ADDED to one member's payment of `amount` (zero in deduct mode)."""
+    if not fees_on_top():
+        return FeeQuote(fee_type=settings.SERVICE_FEE_TYPE, rate=Decimal("0"), amount=Decimal("0.00"))
+    return _policy_fee(Decimal(amount))
+
+
+def quote_fee(gross: Decimal) -> FeeQuote:
+    """The fee taken out of a payout of `gross`. In on_top mode the fee was already paid on top of each
+    contribution, so nothing is deducted and the recipient receives the whole pool."""
+    gross = Decimal(gross)
+    if fees_on_top():
+        return FeeQuote(fee_type=settings.SERVICE_FEE_TYPE, rate=Decimal("0"), amount=Decimal("0.00"))
+    quote = _policy_fee(gross)
+    if quote.amount >= gross:
+        raise ValidationError(
+            f"The pooled amount (₦{gross:,.2f}) does not cover the service fee (₦{quote.amount:,.2f})."
+        )
+    return quote
