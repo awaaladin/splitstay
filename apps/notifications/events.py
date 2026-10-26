@@ -64,8 +64,12 @@ def payout_completed(group, record):
 
 
 def payout_failed(group, record):
+    from apps.payouts.reasons import PLATFORM_REASONS
+
+    delayed = record.failure_reason in PLATFORM_REASONS  # SplitPay's own account, nothing for the group to do
     for user in _audience(group):
-        notify(user, Kind.PAYOUT_FAILED, f"{group.name}: payment failed",
+        notify(user, Kind.PAYOUT_FAILED, f"{group.name}: payout delayed" if delayed else f"{group.name}: payment failed",
+               f"{record.failure_reason}. No action is needed from you." if delayed else
                f"{record.failure_reason or 'The payment could not be completed'}. "
                "The group admin can retry from the group page.",
                group=group, dedupe_key=f"payout_failed:{record.reference}:{user.pk}")

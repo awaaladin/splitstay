@@ -41,6 +41,7 @@
           <div class="receipt-line flex justify-between gap-6" style="--i:4"><dt class="meta">Account</dt><dd class="text-right tnum">{{ record.recipient_bank_name }} · {{ record.masked_account }}</dd></div>
         {% endif %}
         <div class="receipt-line flex justify-between gap-6" style="--i:6"><dt class="meta">Reference</dt><dd class="receipt-mono break-all text-right text-meta">{{ record.reference }}</dd></div>
+        {% if not is_bill and record.gateway == 'manual' and record.gateway_reference %}<div class="receipt-line flex justify-between gap-6" style="--i:7"><dt class="meta">Bank reference</dt><dd class="receipt-mono break-all text-right text-meta">{{ record.gateway_reference }}</dd></div>{% endif %}
         {% if is_bill and record.provider_reference %}<div class="receipt-line flex justify-between gap-6" style="--i:7"><dt class="meta">Biller reference</dt><dd class="receipt-mono text-right text-meta">{{ record.provider_reference }}</dd></div>{% endif %}
       </dl>
 

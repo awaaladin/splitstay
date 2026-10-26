@@ -16,6 +16,7 @@ from apps.notifications import events
 from apps.payments.gateways import GatewayRejected, GatewayUnavailable, get_gateway
 
 from .fees import quote_fee
+from .reasons import friendly_failure_reason
 from .models import Fee, Payout, PayoutStatus, new_payout_reference
 
 log = logging.getLogger(__name__)
@@ -125,7 +126,8 @@ def execute_transfer(payout_id: int) -> None:
             account_name=payout.recipient_account_name, narration=f"SplitPay: {payout.group.name}",
         )
     except GatewayRejected as exc:
-        _finish_transfer(payout.pk, PayoutStatus.FAILED, reason=str(exc))
+        log.error("Transfer %s refused by the gateway: %s", payout.reference, exc)  # the raw reason, for the operator
+        _finish_transfer(payout.pk, PayoutStatus.FAILED, reason=friendly_failure_reason(str(exc)))
         return
     except GatewayUnavailable as exc:
         # Outcome unknown: leave PROCESSING. reconcile_pending() will ask the gateway by reference.
