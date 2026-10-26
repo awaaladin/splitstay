@@ -299,6 +299,12 @@
 .pulse-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 999px; border: 1.5px solid currentColor; opacity: 0; animation: pulse-ring 2.4s ease-out infinite; }
 @keyframes pulse-ring { 0% { transform: scale(.6); opacity: .8; } 100% { transform: scale(1.7); opacity: 0; } }
 
+/* Two-part bar (share vs fee) that fills in when its card reveals */
+.split-bar > i { width: 0; transition: width 1.2s cubic-bezier(.2,.9,.25,1.1); }
+.split-bar > i:nth-child(2) { transition-delay: .25s; }
+.reveal.in .split-bar > i { width: var(--w); }
+@media (prefers-reduced-motion: reduce) { .split-bar > i { width: var(--w); } }
+
 /* Tabs with a sliding highlight */
 .tab-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(25% - 4px); border-radius: 8px; background: rgb(var(--surface)); box-shadow: 0 1px 2px rgb(10 22 48 / .18), 0 0 0 1px rgb(var(--line)); transition: transform .55s cubic-bezier(.3,1.25,.4,1); }
 .panel-in { animation: panel-in .6s cubic-bezier(.2,.9,.25,1.1) both; }

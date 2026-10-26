@@ -167,6 +167,22 @@ class PagesTests(TestCase):
         self.assertIn("₦31,500.00", html)
         self.assertIn("SplitPay service fee", html)
 
+    def test_the_landing_page_explains_how_the_fee_works_with_live_numbers(self):
+        self.client.logout()
+        html = self.client.get(reverse("web:landing")).content.decode()
+        self.assertIn("How our fee works", html)
+        self.assertIn('id="our-fee"', html)
+        self.assertIn("The recipient gets every naira", html)
+        self.assertIn("₦10,500.00", html)   # a ₦10,000 share plus the 5% fee
+        self.assertIn("₦600,000.00", html)  # four ₦150,000 shares reach the landlord in full
+        self.assertIn("₦157,500.00", html)
+
+    def test_the_landing_fee_section_is_hidden_when_the_fee_is_deducted_instead(self):
+        self.client.logout()
+        with override_settings(SERVICE_FEE_MODE="deduct"):
+            html = self.client.get(reverse("web:landing")).content.decode()
+        self.assertNotIn('id="our-fee"', html)
+
     def test_the_api_exposes_the_fee_and_the_total(self):
         client = APIClient()
         client.force_authenticate(self.group.admin)

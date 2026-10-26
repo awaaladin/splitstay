@@ -28,7 +28,7 @@
       </div>
       <ul class="reveal mt-10 flex flex-wrap gap-x-6 gap-y-2 text-meta text-muted" style="--d:750ms">
         <li class="flex items-center gap-2">{% icon "shield-check" 16 %} Not a loan, ever</li>
-        <li class="flex items-center gap-2">{% icon "receipt" 16 %} Fees shown as their own line</li>
+        <li class="flex items-center gap-2">{% icon "receipt" 16 %} <a href="#our-fee" class="underline-offset-4 hover:underline">One small fee, shown before you pay</a></li>
         <li class="flex items-center gap-2">{% icon "lock" 16 %} Bank details encrypted</li>
       </ul>
     </div>
@@ -264,6 +264,57 @@
     </div>
   </div>
 </section>
+
+{# ───────────────────────────── 4b. HOW OUR FEE WORKS ───────────────────────────── #}
+{% if fee.on_top %}
+<section id="our-fee" class="py-24 sm:py-32">
+  <div class="page grid gap-12 lg:grid-cols-12 lg:items-center">
+    <div class="lg:col-span-6">
+      <p class="reveal eyebrow">How our fee works</p>
+      <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg sm:text-5xl" style="--d:100ms">A small fee on each payment. Never a cut of your rent.</h2>
+      <p class="reveal mt-5 max-w-xl text-lead text-muted" style="--d:200ms">This is how SplitPay earns, and you see it before you pay. We add {{ fee.percent|floatformat:"-2" }}% to each person's payment. The group's money, and the landlord's or bill's share of it, is never reduced.</p>
+
+      <ol class="mt-8 space-y-5">
+        <li class="reveal flex gap-4" style="--d:300ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">1</span><div><p class="text-body font-medium">You pay your share plus {{ fee.percent|floatformat:"-2" }}%.</p><p class="meta mt-0.5">Your share, the fee and the total are listed on the group page before you press Pay.</p></div></li>
+        <li class="reveal flex gap-4" style="--d:380ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">2</span><div><p class="text-body font-medium">Your whole share goes into the group's pot.</p><p class="meta mt-0.5">The fee is ours. It is never counted toward what you owe the group.</p></div></li>
+        <li class="reveal flex gap-4" style="--d:460ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">3</span><div><p class="text-body font-medium">The recipient gets every naira.</p><p class="meta mt-0.5">The full amount the group collected is paid to the landlord, the bill or the family account.</p></div></li>
+      </ol>
+      <div class="reveal mt-8 flex flex-wrap gap-3" style="--d:540ms">
+        <a href="{% url 'web:pricing' %}" class="btn-secondary">See more examples {% icon "arrow-right" 16 %}</a>
+        <a href="{% url 'web:guide' %}#g-faq" class="btn-quiet">Read the fee FAQ</a>
+      </div>
+    </div>
+
+    <div class="reveal lg:col-span-6" style="--d:200ms">
+      <div class="card overflow-hidden shadow-raised">
+        <div class="border-b border-line px-6 py-4"><p class="eyebrow">Example 1 · One person's payment</p></div>
+        <div class="px-6 py-5">
+          <dl class="space-y-2.5 text-body">
+            <div class="flex items-baseline justify-between"><dt class="text-muted">Your share (goes to the group)</dt><dd class="amount">{{ fee_examples.small.share|naira }}</dd></div>
+            <div class="flex items-center justify-between rounded-md bg-primary-soft px-3 py-2 text-primary"><dt class="flex items-center gap-2"><span class="pulse-dot h-1.5 w-1.5 rounded-full bg-primary"></span>SplitPay fee ({{ fee.percent|floatformat:"-2" }}%)</dt><dd class="amount">+{{ fee_examples.small.fee|naira }}</dd></div>
+            <div class="flex items-baseline justify-between border-t border-line pt-3 text-lead font-semibold"><dt>You pay</dt><dd class="amount">{{ fee_examples.small.total|naira }}</dd></div>
+          </dl>
+          <div class="split-bar mt-4 flex h-2.5 overflow-hidden rounded-full bg-sunken" role="img" aria-label="Of the total, {{ fee_examples.small.share_pct }}% is your share and {{ fee_examples.small.fee_pct }}% is the fee">
+            <i style="--w:{{ fee_examples.small.share_pct|stringformat:'s' }}%" class="block h-full bg-primary"></i>
+            <i style="--w:{{ fee_examples.small.fee_pct|stringformat:'s' }}%" class="block h-full bg-primary/35"></i>
+          </div>
+          <p class="meta mt-2 flex justify-between"><span>Your share</span><span>Fee</span></p>
+        </div>
+
+        <div class="border-y border-line bg-sunken px-6 py-3"><p class="eyebrow">Example 2 · Four friends, one rent</p></div>
+        <div class="px-6 py-5">
+          <dl class="space-y-2.5 text-body">
+            <div class="flex items-baseline justify-between"><dt class="text-muted">Each person's share</dt><dd class="amount">{{ fee_examples.rent.share|naira }}</dd></div>
+            <div class="flex items-baseline justify-between"><dt class="text-muted">Each person pays ({{ fee_examples.rent.fee|naira }} fee added)</dt><dd class="amount">{{ fee_examples.rent.total|naira }}</dd></div>
+            <div class="flex items-baseline justify-between border-t border-line pt-3 text-lead font-semibold"><dt>The landlord receives</dt><dd class="amount text-ok">{{ fee_examples.rent.pool|naira }}</dd></div>
+          </dl>
+          <p class="hint mt-3">In full. Nothing is taken out of the rent.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
 
 {# ───────────────────────────── 5. HOW IT WORKS ───────────────────────────── #}
 <section class="py-24 sm:py-32">

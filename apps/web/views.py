@@ -115,10 +115,25 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
 
 # --- public + auth ----------------------------------------------------------------------
 
+def _fee_examples() -> dict:
+    """Worked examples for the public pages, computed from the live fee so they can never drift."""
+    examples = {}
+    for key, share in (("small", Decimal("10000")), ("rent", Decimal("150000"))):
+        fee = fee_for_payment(share).amount
+        total = share + fee
+        examples[key] = {
+            "share": share, "fee": fee, "total": total,
+            "share_pct": round(float(share / total * 100), 1) if total else 100,
+            "fee_pct": round(float(fee / total * 100), 1) if total else 0,
+        }
+    examples["rent"]["pool"] = examples["rent"]["share"] * 4  # four friends, the recipient gets all of it
+    return examples
+
+
 def landing(request):
     if request.user.is_authenticated:
         return redirect("web:dashboard")
-    return render(request, "landing.html", {"fee": _fee_policy()})
+    return render(request, "landing.html", {"fee": _fee_policy(), "fee_examples": _fee_examples()})
 
 
 def guide(request):
