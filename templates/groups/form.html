@@ -12,7 +12,7 @@
     members: JSON.parse(document.getElementById('gf-members').textContent),
     editing: {{ editing|yesno:'true,false' }},
     billEnabled: {{ bill_enabled|yesno:'true,false' }},
-    fee: { type: '{{ fee.type }}', on_top: {{ fee.on_top|yesno:'true,false' }}, flat: {{ fee.flat|unlocalize }}, percent: {{ fee.percent|unlocalize }}, min: {{ fee.min|unlocalize }}, max: {{ fee.max|unlocalize }} }
+    fee: { type: '{{ fee.type }}', on_top: {{ fee.on_top|yesno:'true,false' }}, flat: {{ fee.flat|unlocalize }}, percent: {{ fee.percent|unlocalize }}, min: {{ fee.min|unlocalize }}, max: {{ fee.max|unlocalize }}, per_payment: {{ fee.per_payment|unlocalize }}, tiers: {{ fee.tiers_js }} }
   })">
 
   <a href="{% if editing %}{% url 'web:group_detail' editing.pk %}{% else %}{% url 'web:dashboard' %}{% endif %}" class="btn-quiet btn-sm -ml-3 mb-4 inline-flex">{% icon "arrow-left" 16 %} Back</a>

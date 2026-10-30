@@ -22,11 +22,24 @@ def fees_on_top() -> bool:
     return settings.SERVICE_FEE_MODE == "on_top"
 
 
-def _policy_fee(base: Decimal) -> FeeQuote:
+def rate_for_pot(pot: Decimal | None) -> Decimal:
+    """The percentage for a group of this target. Each tier's limit is inclusive; without tiers, the flat setting."""
+    tiers = settings.SERVICE_FEE_TIERS
+    if not tiers:
+        return Decimal(settings.SERVICE_FEE_PERCENT)
+    if pot is None:
+        return tiers[0][1]
+    for limit, rate in tiers:
+        if limit is None or Decimal(pot) <= limit:
+            return rate
+    return tiers[-1][1]
+
+
+def _policy_fee(base: Decimal, pot: Decimal | None = None) -> FeeQuote:
     """The configured fee for `base` (a whole pool in deduct mode, one member's payment in on_top mode)."""
     kind = settings.SERVICE_FEE_TYPE
     if kind == "percent":
-        rate = Decimal(settings.SERVICE_FEE_PERCENT)
+        rate = rate_for_pot(pot)
         amount = (base * rate / 100).quantize(KOBO, rounding=ROUND_HALF_UP)
         minimum, maximum = Decimal(settings.SERVICE_FEE_MIN), Decimal(settings.SERVICE_FEE_MAX)
         if minimum:
@@ -40,11 +53,12 @@ def _policy_fee(base: Decimal) -> FeeQuote:
     return FeeQuote(fee_type=kind, rate=rate, amount=amount)
 
 
-def fee_for_payment(amount: Decimal) -> FeeQuote:
-    """The fee ADDED to one member's payment of `amount` (zero in deduct mode)."""
+def fee_for_payment(amount: Decimal, pot: Decimal | None = None) -> FeeQuote:
+    """The fee ADDED to one member's payment of `amount` toward a group targeting `pot` (zero in deduct mode)."""
     if not fees_on_top():
         return FeeQuote(fee_type=settings.SERVICE_FEE_TYPE, rate=Decimal("0"), amount=Decimal("0.00"))
-    return _policy_fee(Decimal(amount))
+    quote = _policy_fee(Decimal(amount), pot)
+    return FeeQuote(quote.fee_type, quote.rate, quote.amount + Decimal(settings.SERVICE_FEE_PER_PAYMENT))
 
 
 def quote_fee(gross: Decimal) -> FeeQuote:

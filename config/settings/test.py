@@ -15,6 +15,7 @@ PAYSTACK_SECRET_KEY = "sk_test_unit"
 SERVICE_FEE_MODE = "deduct"  # the long-standing tests assume a flat N150 taken at payout; on_top tests override this
 SERVICE_FEE_TYPE = "flat"
 SERVICE_FEE_FLAT = 150
+SERVICE_FEE_TIERS = []  # most tests pin one rate; apps/payouts/test_fee_tiers.py turns tiers on
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},

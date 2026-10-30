@@ -56,12 +56,21 @@
         feeFor: function (base) {
           var f = this.fee;
           if (!f) return 0;
-          var a = f.type === 'percent' ? base * f.percent / 100 : f.flat;
+          var a = f.type === 'percent' ? base * this.feePercent() / 100 : f.flat;
           if (f.type === 'percent') {
             if (f.min) a = Math.max(a, f.min);
             if (f.max) a = Math.min(a, f.max);
           }
+          if (f.on_top) a += f.per_payment || 0;
           return Math.round(a * 100) / 100;
+        },
+        /* The rate depends on the group's target; each tier's limit is inclusive, as in fees.py. */
+        feePercent: function () {
+          var tiers = this.fee.tiers || [];
+          for (var i = 0; i < tiers.length; i++) {
+            if (tiers[i][0] === null || this.targetNumber <= tiers[i][0]) return tiers[i][1];
+          }
+          return this.fee.percent;
         },
         get onTop() { return !!(this.fee && this.fee.on_top); },
         get feeAmount() { return this.onTop ? this.feeFor(this.equalShare) : this.feeFor(this.targetNumber); },

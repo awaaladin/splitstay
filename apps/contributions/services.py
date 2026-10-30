@@ -36,7 +36,7 @@ def initiate_contribution(group: ContributionGroup, user, amount=None) -> Contri
     if amount > outstanding:
         raise ValidationError(f"That is more than your outstanding share of ₦{outstanding:,.2f}.")
 
-    fee = fee_for_payment(amount).amount  # added on top; never part of the share or the pot
+    fee = fee_for_payment(amount, group.target_amount).amount  # added on top; never part of the share or the pot
 
     # Re-clicking "Pay" shouldn't leave a trail of duplicate pending rows.
     existing = (

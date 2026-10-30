@@ -71,7 +71,7 @@ class GroupSerializer(serializers.ModelSerializer):
         membership = obj.memberships.filter(user=request.user, status="joined").first() if request else None
         if not membership or not obj.is_open_for_contributions or membership.outstanding <= 0:
             return None
-        fee = fee_for_payment(membership.outstanding).amount
+        fee = fee_for_payment(membership.outstanding, obj.target_amount).amount
         return {"share": membership.outstanding, "fee": fee, "total": membership.outstanding + fee}
 
     def get_needs_review(self, obj) -> bool:

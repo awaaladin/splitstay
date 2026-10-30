@@ -13,10 +13,26 @@ android {
         applicationId = "com.splitpay.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toInt() ?: 1 // Must rise for phones to accept updates.
         versionName = "0.1.0"
         buildConfigField("String", "SITE_URL", "\"https://splitpay-swart.vercel.app\"")
         buildConfigField("String", "API_BASE_URL", "\"https://splitpay-swart.vercel.app/api/v1/\"")
+    }
+
+    signingConfigs {
+        System.getenv("KEYSTORE_PATH")?.let { path ->
+            create("release") {
+                storeFile = file(path)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.findByName("release")
+        }
     }
 
     compileOptions {

@@ -29,7 +29,7 @@ from apps.notifications.models import Notification
 from apps.payments import services as payment_services
 from apps.payments.gateways import GatewayError
 from apps.payouts import services as payout_services
-from apps.payouts.fees import fee_for_payment, fees_on_top
+from apps.payouts.fees import fee_for_payment, fees_on_top, rate_for_pot
 
 from .forms import BankAccountForm, GroupForm, InviteForm, LoginForm, ProfileForm, RegisterForm
 
@@ -93,7 +93,7 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
         and my_row and my_row["outstanding"] > 0
     )
     # What "Pay" will actually charge: the member's outstanding share plus SplitPay's fee on top.
-    pay_fee = fee_for_payment(my_row["outstanding"]).amount if can_pay else Decimal("0.00")
+    pay_fee = fee_for_payment(my_row["outstanding"], group.target_amount).amount if can_pay else Decimal("0.00")
     ctx.update(
         progress=prog, **pot_geometry(prog, initial), rows=rows, my_row=my_row,
         entries=ledger.group_entries(group)[:10], record=record, is_bill=is_bill,
@@ -115,11 +115,14 @@ def group_page_context(request, group: ContributionGroup, *, initial: bool = Fal
 
 # --- public + auth ----------------------------------------------------------------------
 
+EXAMPLE_POT = Decimal("600000")  # the four-friends rent used across the public pages
+
+
 def _fee_examples() -> dict:
     """Worked examples for the public pages, computed from the live fee so they can never drift."""
     examples = {}
     for key, share in (("small", Decimal("10000")), ("rent", Decimal("150000"))):
-        fee = fee_for_payment(share).amount
+        fee = fee_for_payment(share, EXAMPLE_POT).amount
         total = share + fee
         examples[key] = {
             "share": share, "fee": fee, "total": total,
@@ -189,13 +192,13 @@ def pricing(request):
     if fees_on_top():
         # One person's share -> the fee added at checkout -> what they pay. The recipient gets the full pool.
         for share in (Decimal("2000"), Decimal("5000"), Decimal("10000"), Decimal("37500"), Decimal("150000")):
-            fee = fee_for_payment(share).amount
+            fee = fee_for_payment(share, EXAMPLE_POT).amount
             examples.append({"share": share, "fee": fee, "total": share + fee})
     else:
         for pool in (Decimal("30000"), Decimal("150000"), Decimal("600000")):
             quote = quote_fee(pool)
             examples.append({"pool": pool, "fee": quote.amount, "net": quote.net(pool)})
-    return render(request, "pages/pricing.html", {"fee": _fee_policy(), "examples": examples})
+    return render(request, "pages/pricing.html", {"fee": _fee_policy(), "examples": examples, "example_pot": EXAMPLE_POT})
 
 
 def privacy(request):
@@ -380,10 +383,20 @@ def group_new(request):
 
 
 def _fee_policy() -> dict:
+    tiers = settings.SERVICE_FEE_TIERS
+    rates = [rate for _, rate in tiers]
+    percent = rate_for_pot(EXAMPLE_POT)
+    rows, floor = [], None
+    for limit, rate in tiers:
+        rows.append({"low": floor, "high": limit, "rate": rate})
+        floor = limit
     return {
         "mode": settings.SERVICE_FEE_MODE, "on_top": fees_on_top(), "type": settings.SERVICE_FEE_TYPE,
-        "flat": settings.SERVICE_FEE_FLAT, "percent": settings.SERVICE_FEE_PERCENT,
+        "flat": settings.SERVICE_FEE_FLAT, "percent": percent,
         "min": settings.SERVICE_FEE_MIN, "max": settings.SERVICE_FEE_MAX,
+        "per_payment": settings.SERVICE_FEE_PER_PAYMENT, "tiers": rows,
+        "tiers_js": "[" + ",".join(f"[{'null' if limit is None else limit},{rate}]" for limit, rate in tiers) + "]",
+        "rate_label": f"{min(rates):f}% to {max(rates):f}%" if rates else f"{percent:f}%",
     }
 
 

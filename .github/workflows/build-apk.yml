@@ -27,7 +27,16 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x ./gradlew
-      - run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build the debug and signed release APKs
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          export KEYSTORE_PATH="$RUNNER_TEMP/splitpay.jks"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          ./gradlew assembleDebug assembleRelease --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
@@ -38,6 +47,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SplitPay.apk
+          cp android/app/build/outputs/apk/release/app-release.apk SplitPay.apk
           gh release view app-latest || gh release create app-latest --title "SplitPay Android app" --notes "The latest Android build."
           gh release upload app-latest SplitPay.apk --clobber

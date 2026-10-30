@@ -253,6 +253,9 @@ SERVICE_FEE_FLAT = Decimal(env("SERVICE_FEE_FLAT", "150"))
 SERVICE_FEE_PERCENT = Decimal(env("SERVICE_FEE_PERCENT", "5"))
 SERVICE_FEE_MIN = Decimal(env("SERVICE_FEE_MIN", "0"))
 SERVICE_FEE_MAX = Decimal(env("SERVICE_FEE_MAX", "0"))  # 0 = no cap
+# Percent by the group's target: (inclusive upper limit in naira, rate). Replaces SERVICE_FEE_PERCENT when set.
+SERVICE_FEE_TIERS = [(Decimal("1000000"), Decimal("5")), (Decimal("10000000"), Decimal("4")), (None, Decimal("3"))]
+SERVICE_FEE_PER_PAYMENT = Decimal(env("SERVICE_FEE_PER_PAYMENT", "0"))  # naira added to every payment in on_top mode
 
 LOGGING = {
     "version": 1,

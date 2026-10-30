@@ -276,10 +276,10 @@
     <div class="lg:col-span-6">
       <p class="reveal eyebrow">How our fee works</p>
       <h2 class="reveal mt-4 text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.03em] text-fg sm:text-5xl" style="--d:100ms">A small fee on each payment. Never a cut of your rent.</h2>
-      <p class="reveal mt-5 max-w-xl text-lead text-muted" style="--d:200ms">This is how SplitPay earns, and you see it before you pay. We add {{ fee.percent|floatformat:"-2" }}% to each person's payment. The group's money, and the landlord's or bill's share of it, is never reduced.</p>
+      <p class="reveal mt-5 max-w-xl text-lead text-muted" style="--d:200ms">This is how SplitPay earns, and you see it before you pay. We add {{ fee.rate_label }} to each person's payment, depending on the size of the group. The group's money, and the landlord's or bill's share of it, is never reduced.</p>
 
       <ol class="mt-8 space-y-5">
-        <li class="reveal flex gap-4" style="--d:300ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">1</span><div><p class="text-body font-medium">You pay your share plus {{ fee.percent|floatformat:"-2" }}%.</p><p class="meta mt-0.5">Your share, the fee and the total are listed on the group page before you press Pay.</p></div></li>
+        <li class="reveal flex gap-4" style="--d:300ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">1</span><div><p class="text-body font-medium">You pay your share plus {{ fee.rate_label }}.</p><p class="meta mt-0.5">Your share, the fee and the total are listed on the group page before you press Pay.</p></div></li>
         <li class="reveal flex gap-4" style="--d:380ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">2</span><div><p class="text-body font-medium">Your whole share goes into the group's pot.</p><p class="meta mt-0.5">The fee is ours. It is never counted toward what you owe the group.</p></div></li>
         <li class="reveal flex gap-4" style="--d:460ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">3</span><div><p class="text-body font-medium">The recipient gets every naira.</p><p class="meta mt-0.5">The full amount the group collected is paid to the landlord, the bill or the family account.</p></div></li>
       </ol>
