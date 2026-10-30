@@ -1,5 +1,6 @@
 from dataclasses import asdict
 
+from django.conf import settings
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
@@ -34,6 +35,14 @@ class BillerListView(APIView):
     @extend_schema(responses=BillerSerializer(many=True))
     def get(self, request):
         return Response([asdict(b) for b in catalog.BILLERS.values()])
+
+
+class BillStatusView(APIView):
+    """Whether bill-payment groups can be created, so clients only offer what will work."""
+
+    @extend_schema(responses={200: dict})
+    def get(self, request):
+        return Response({"enabled": settings.BILL_PAYMENTS_ENABLED})
 
 
 class ValidateMeterView(APIView):

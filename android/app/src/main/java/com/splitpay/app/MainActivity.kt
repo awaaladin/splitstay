@@ -35,10 +35,12 @@ import com.splitpay.app.data.SplitPayApi
 import com.splitpay.app.data.buildApi
 import com.splitpay.app.ui.AccountScreen
 import com.splitpay.app.ui.AuthScreen
+import com.splitpay.app.ui.DashboardScreen
 import com.splitpay.app.ui.GroupDetailScreen
-import com.splitpay.app.ui.GroupsScreen
-import com.splitpay.app.ui.NewGroupScreen
+import com.splitpay.app.ui.GroupFormScreen
+import com.splitpay.app.ui.LedgerScreen
 import com.splitpay.app.ui.NotificationsScreen
+import com.splitpay.app.ui.ReceiptScreen
 import com.splitpay.app.ui.SplitPayTheme
 import com.splitpay.app.ui.rememberUnreadCount
 
@@ -106,6 +108,9 @@ private fun titleFor(route: String): String = when (route) {
     "notifications" -> "Notifications"
     "account" -> "Account"
     "groups/{id}" -> "Group"
+    "groups/{id}/edit" -> "Edit group"
+    "groups/{id}/ledger" -> "Ledger"
+    "groups/{id}/receipt" -> "Receipt"
     else -> "My groups"
 }
 
@@ -113,12 +118,26 @@ private fun titleFor(route: String): String = when (route) {
 private fun Routes(nav: NavHostController, api: SplitPayApi, session: Session, padding: PaddingValues) {
     val idArgument = remember { listOf(navArgument("id") { type = NavType.IntType }) }
     NavHost(nav, startDestination = "groups") {
-        composable("groups") { GroupsScreen(api, padding) { nav.navigate("groups/$it") } }
-        composable("groups/{id}", idArgument) { entry ->
-            GroupDetailScreen(api, entry.arguments!!.getInt("id"), padding, onLeft = { nav.popBackStack() })
+        composable("groups") {
+            DashboardScreen(api, padding, onOpen = { nav.navigate("groups/$it") }, onNotifications = { nav.navigate("notifications") })
         }
+        composable("groups/{id}", idArgument) { entry ->
+            val id = entry.arguments!!.getInt("id")
+            GroupDetailScreen(
+                api, id, padding,
+                onLeft = { nav.popBackStack() },
+                onEdit = { nav.navigate("groups/$id/edit") },
+                onLedger = { nav.navigate("groups/$id/ledger") },
+                onReceipt = { nav.navigate("groups/$id/receipt") },
+            )
+        }
+        composable("groups/{id}/edit", idArgument) { entry ->
+            GroupFormScreen(api, padding, entry.arguments!!.getInt("id")) { nav.popBackStack() }
+        }
+        composable("groups/{id}/ledger", idArgument) { entry -> LedgerScreen(api, entry.arguments!!.getInt("id"), padding) }
+        composable("groups/{id}/receipt", idArgument) { entry -> ReceiptScreen(api, entry.arguments!!.getInt("id"), padding) }
         composable("new") {
-            NewGroupScreen(api, padding) { id ->
+            GroupFormScreen(api, padding, null) { id ->
                 nav.navigate("groups/$id") { popUpTo("new") { inclusive = true } }
             }
         }

@@ -3,9 +3,10 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.web.models import ContactMessage
-from apps.testing import make_user
+from apps.contributions.services import initiate_contribution
+from apps.testing import make_group, make_user
 
-PUBLIC = ("web:landing", "web:guide", "web:about", "web:pricing", "web:contact", "web:privacy", "web:terms")
+PUBLIC = ("web:landing", "web:app_download", "web:guide", "web:about", "web:pricing", "web:contact", "web:privacy", "web:terms")
 
 
 class SearchEngineTests(TestCase):
@@ -32,6 +33,31 @@ class SearchEngineTests(TestCase):
     def test_pages_declare_their_canonical_url(self):
         html = self.client.get(reverse("web:pricing")).content.decode()
         self.assertIn('<link rel="canonical" href="https://example.test/fees/">', html)
+
+
+class AndroidAppPageTests(TestCase):
+    @override_settings(ANDROID_APK_URL="https://example.test/SplitPay.apk")
+    def test_page_links_to_the_apk_and_explains_chrome_blocks(self):
+        html = self.client.get(reverse("web:app_download")).content.decode()
+        self.assertIn('href="https://example.test/SplitPay.apk"', html)
+        self.assertIn("Install unknown apps", html)
+
+    def test_footer_links_to_the_app_page(self):
+        html = self.client.get(reverse("web:about")).content.decode()
+        self.assertIn(f'href="{reverse("web:app_download")}"', html)
+
+
+class AppCheckoutReturnTests(TestCase):
+    def test_the_app_browser_gets_a_way_back_without_a_website_login(self):
+        group = make_group()
+        member = group.memberships.exclude(user=group.admin).first().user
+        contribution = initiate_contribution(group, member)
+        res = self.client.get(reverse("web:payment_return"), {"reference": contribution.reference})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "splitpay://payment")
+
+    def test_unknown_references_are_not_found(self):
+        self.assertEqual(self.client.get(reverse("web:payment_return"), {"reference": "nope"}).status_code, 404)
 
 
 class PublicPagesTests(TestCase):

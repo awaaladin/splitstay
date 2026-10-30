@@ -212,6 +212,25 @@ PAYSTACK_BASE_URL = env("PAYSTACK_BASE_URL", "https://api.paystack.co")
 PAYSTACK_TRANSFER_FEES = [(Decimal("5000"), Decimal("10")), (Decimal("50000"), Decimal("25")), (None, Decimal("50"))]
 SITE_URL = env("SITE_URL", "http://localhost:8000")
 
+# --- Email --------------------------------------------------------------------------------
+# Gmail SMTP until a domain is verified with a provider such as Resend (then only these settings change).
+# Without a password (local development) emails are printed to the console instead.
+EMAIL_HOST = env("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(env("EMAIL_PORT", "465"))
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False) and not EMAIL_USE_SSL  # the two are mutually exclusive
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+EMAIL_TIMEOUT = 8  # Vercel stops a function at 10 seconds
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST_PASSWORD else "django.core.mail.backends.console.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = env("EMAIL_FROM") or env("DEFAULT_FROM_EMAIL") or "SplitPay <no-reply@splitpay.local>"
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+SUPPORT_EMAIL = env("SUPPORT_EMAIL") or EMAIL_HOST_USER or "support@splitpay.local"
+ANDROID_APK_URL = env("ANDROID_APK_URL", "https://github.com/awaaladin/splitstay/releases/download/app-latest/SplitPay.apk")
+
 # Bill providers: "vtpass" or "mock".
 BILL_PROVIDER = env("BILL_PROVIDER", "mock")
 VTPASS_BASE_URL = env("VTPASS_BASE_URL", "https://sandbox.vtpass.com/api")

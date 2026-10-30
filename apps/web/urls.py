@@ -9,6 +9,7 @@ urlpatterns = [
     path("robots.txt", views.robots_txt, name="robots"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap"),
     path(views.GOOGLE_VERIFICATION_FILE, views.google_verification, name="google_verification"),
+    path("app/", views.app_download, name="app_download"),
     path("guide/", views.guide, name="guide"),
     path("about/", views.about, name="about"),
     path("fees/", views.pricing, name="pricing"),

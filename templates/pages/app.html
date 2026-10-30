@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static cp %}
+{% block title %}Download the SplitPay Android app{% endblock %}
+{% block og_title %}Download the SplitPay Android app{% endblock %}
+{% block description %}Get the SplitPay app for Android phones. Same account, same groups and same payments as the website, with simple steps if your phone blocks the download.{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="mx-auto max-w-2xl">
+    <p class="eyebrow">Android app</p>
+    <h1 class="page-title mt-1">SplitPay on your phone</h1>
+    <p class="mt-4 text-lead text-muted">The same account, groups and payments as the website. Sign in with the details you already use.</p>
+
+    <a href="{{ download_url }}" class="btn-primary btn-block mt-6">Download for Android</a>
+    <p class="hint">Needs Android 8 or newer. iPhone isn't supported yet, so please use the website.</p>
+
+    <h2 class="section-title mt-10">How to install it</h2>
+    <ol class="mt-3 list-decimal space-y-2 pl-5 text-body text-muted">
+      <li>Open this page in Chrome on your Android phone and tap <strong class="text-fg">Download for Android</strong>.</li>
+      <li>When the download finishes, tap <strong class="text-fg">Open</strong>. You can also find <strong class="text-fg">SplitPay.apk</strong> in the Files app, under Downloads.</li>
+      <li>Tap <strong class="text-fg">Install</strong>, then open SplitPay and sign in.</li>
+    </ol>
+
+    <h2 class="section-title mt-10">If it doesn't download or install</h2>
+    <p class="mt-3 text-body text-muted">SplitPay isn't on the Play Store yet, so Android and Chrome ask you to confirm. Find the message you see below.</p>
+
+    <div class="card card-pad mt-4">
+      <h3 class="text-body font-semibold text-fg">Chrome says the file might be harmful</h3>
+      <p class="mt-2 text-body text-muted">Chrome shows this for apps from outside the Play Store. Tap <strong class="text-fg">Download anyway</strong>.</p>
+      <p class="mt-2 text-body text-muted">If you don't see that option, open Chrome's menu (the three dots), tap <strong class="text-fg">Downloads</strong>, and look for SplitPay.apk there.</p>
+    </div>
+
+    <div class="card card-pad mt-4">
+      <h3 class="text-body font-semibold text-fg">Your phone says it can't install apps from this source</h3>
+      <ol class="mt-2 list-decimal space-y-2 pl-5 text-body text-muted">
+        <li>Open your phone's <strong class="text-fg">Settings</strong>, then <strong class="text-fg">Apps</strong>.</li>
+        <li>Tap <strong class="text-fg">Chrome</strong>. If you can't see it, tap <strong class="text-fg">See all apps</strong> first.</li>
+        <li>Tap <strong class="text-fg">Install unknown apps</strong> and turn on <strong class="text-fg">Allow from this source</strong>.</li>
+        <li>Go back to your downloads and tap SplitPay.apk again.</li>
+      </ol>
+      <p class="mt-2 text-meta text-muted">The wording changes a little between phone brands. If you can't find it, search for "unknown apps" in Settings. You can turn it off again after installing.</p>
+    </div>
+
+    <div class="card card-pad mt-4">
+      <h3 class="text-body font-semibold text-fg">Google Play Protect shows a warning</h3>
+      <p class="mt-2 text-body text-muted">Tap <strong class="text-fg">More details</strong>, then <strong class="text-fg">Install anyway</strong>.</p>
+    </div>
+
+    <div class="card card-pad mt-4">
+      <h3 class="text-body font-semibold text-fg">The download doesn't start</h3>
+      <p class="mt-2 text-body text-muted">Check that you have about 30 MB of free space and a working connection, then try again. If it still won't start, open Chrome's menu, tap the settings item, then <strong class="text-fg">Site settings</strong>, then <strong class="text-fg">Automatic downloads</strong>, and allow it.</p>
+    </div>
+
+    <div class="card card-pad mt-4">
+      <h3 class="text-body font-semibold text-fg">It says the app wasn't installed when updating</h3>
+      <p class="mt-2 text-body text-muted">Uninstall the old SplitPay app, then install the new one. Your groups and payments are safe because they're stored in your account. You'll just need to sign in again.</p>
+    </div>
+
+    <p class="alert-warn mt-6 text-meta">{% icon "alert" 18 "mt-0.5" %} <span>Only download SplitPay from this page. Never install a copy someone sends you on WhatsApp or elsewhere.</span></p>
+    <p class="mt-6 text-body text-muted">Still stuck? <a class="text-primary underline" href="{% url 'web:contact' %}">Contact us</a> and tell us what message you see.</p>
+  </div>
+</div>
+{% endblock %}

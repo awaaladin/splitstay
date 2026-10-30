@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: build-apk-${{ github.ref }}
   cancel-in-progress: true
@@ -29,3 +32,12 @@ jobs:
         with:
           name: app-debug
           path: android/app/build/outputs/apk/debug/*.apk
+      - name: Publish the APK for the website download page
+        if: github.ref == 'refs/heads/main'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk SplitPay.apk
+          gh release view app-latest || gh release create app-latest --title "SplitPay Android app" --notes "The latest Android build."
+          gh release upload app-latest SplitPay.apk --clobber

@@ -29,6 +29,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -42,15 +43,25 @@ interface SplitPayApi {
     @DELETE("auth/me/bank-account/") suspend fun deleteBankAccount(): retrofit2.Response<Unit>
 
     @GET("groups/?page_size=100") suspend fun groups(): Page<Group>
-    @POST("groups/") suspend fun createGroup(@Body body: GroupInput): Group
+    @POST("groups/") suspend fun createGroup(@Body body: JsonObject): Group
+    @PATCH("groups/{id}/") suspend fun updateGroup(@Path("id") id: Int, @Body body: JsonObject): Group
     @GET("groups/{id}/") suspend fun group(@Path("id") id: Int): Group
     @POST("groups/{id}/accept/") suspend fun accept(@Path("id") id: Int): Group
     @POST("groups/{id}/leave/") suspend fun leave(@Path("id") id: Int): retrofit2.Response<Unit>
     @POST("groups/{id}/cancel/") suspend fun cancel(@Path("id") id: Int): Group
-    @POST("groups/{id}/members/") suspend fun addMember(@Path("id") id: Int, @Body body: MemberInput): Membership
+    @POST("groups/{id}/members/") suspend fun addMember(@Path("id") id: Int, @Body body: JsonObject): Membership
+    @PATCH("groups/{id}/members/{user}/") suspend fun setShare(@Path("id") id: Int, @Path("user") user: Int, @Body body: JsonObject): Membership
+    @DELETE("groups/{id}/members/{user}/") suspend fun removeMember(@Path("id") id: Int, @Path("user") user: Int): retrofit2.Response<Unit>
     @POST("groups/{id}/contribute/") suspend fun contribute(@Path("id") id: Int, @Body body: ContributeRequest): ContributeResponse
     @POST("groups/{id}/payout/") suspend fun payout(@Path("id") id: Int): retrofit2.Response<Unit>
-    @GET("groups/{id}/ledger/") suspend fun ledger(@Path("id") id: Int): Ledger
+    @GET("groups/{id}/ledger/?page_size=100") suspend fun ledger(@Path("id") id: Int): Ledger
+    @GET("payouts/") suspend fun payouts(@Query("group") group: Int): Page<PayoutRecord>
+    @GET("billpay/payments/") suspend fun billPayments(@Query("group") group: Int): Page<PayoutRecord>
+    @GET("contributions/?page_size=100") suspend fun contributions(@Query("group") group: Int): Page<Contribution>
+
+    @GET("billpay/status/") suspend fun billStatus(): BillStatus
+    @GET("billpay/billers/") suspend fun billers(): List<Biller>
+    @POST("billpay/validate/") suspend fun checkMeter(@Body body: JsonObject): MeterCheck
 
     @POST("payments/verify/{reference}/") suspend fun verify(@Path("reference") reference: String): Contribution
 
@@ -95,7 +106,7 @@ class Session(context: Context) {
     }
 }
 
-private val json = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = true }
+private val json = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = true; coerceInputValues = true }
 
 fun buildApi(session: Session): SplitPayApi {
     val contentType = "application/json".toMediaType()

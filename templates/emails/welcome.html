@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block preheader %}Your SplitPay account is ready{% endblock %}
+{% block content %}
+<h1 style="margin:0 0 12px 0;font-size:22px;line-height:1.3;">Welcome to SplitPay</h1>
+<p style="margin:0 0 16px 0;">Hi {{ name }}, your account is ready.</p>
+<p style="margin:0 0 18px 0;">Create a group, invite the people you share the cost with, and SplitPay pays the bill or the landlord once the target is met.</p>
+<p style="margin:0;"><a href="{{ site_url }}/dashboard/" style="color:#426086;">Open SplitPay</a> ({{ site_url }}/dashboard/)</p>
+{% endblock %}

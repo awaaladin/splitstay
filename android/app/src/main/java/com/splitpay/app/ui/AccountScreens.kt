@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -90,6 +91,7 @@ fun AccountScreen(api: SplitPayApi, session: Session, padding: PaddingValues) {
         api.me() to account
     }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Box(Modifier.fillMaxSize().padding(padding)) {
         Loaded(loader) { (profile, account) ->
             var name by remember(profile) { mutableStateOf(profile.fullName) }
@@ -130,6 +132,10 @@ fun AccountScreen(api: SplitPayApi, session: Session, padding: PaddingValues) {
                 HorizontalDivider()
                 BankSection(api, account, loader::reload)
                 HorizontalDivider()
+                SITE_PAGES.forEach { (title, path) ->
+                    TextButton(onClick = { openPage(context, path) }) { Text(title) }
+                }
+                HorizontalDivider()
                 OutlinedButton(onClick = session::clear, modifier = Modifier.fillMaxWidth()) { Text("Sign out") }
             }
         }
@@ -151,6 +157,19 @@ private fun BankSection(api: SplitPayApi, account: BankAccount?, onChanged: () -
         LabelValue(account.bankName, account.maskedNumber)
         LabelValue("Name", account.accountName)
         OutlinedButton(onClick = { editing = true }, modifier = Modifier.fillMaxWidth()) { Text("Change") }
+        TextButton(onClick = {
+            scope.launch {
+                try {
+                    api.deleteBankAccount()
+                    onChanged()
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    error = e.userMessage()
+                }
+            }
+        }) { Text("Remove bank account") }
+        ErrorText(error)
         return
     }
     Picker("Bank", BANKS, bank) { bank = it }

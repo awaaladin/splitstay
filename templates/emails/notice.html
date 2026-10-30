@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block preheader %}{{ headline }}{% endblock %}
+{% block content %}
+<h1 style="margin:0 0 12px 0;font-size:22px;line-height:1.3;">{{ headline }}</h1>
+<p style="margin:0 0 16px 0;">Hi {{ name }},</p>
+<p style="margin:0 0 18px 0;">{{ body }}</p>
+{% if link %}<p style="margin:0;"><a href="{{ site_url }}{{ link }}" style="color:#426086;">Open on {{ brand }}</a> ({{ site_url }}{{ link }})</p>{% endif %}
+{% endblock %}

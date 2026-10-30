@@ -1,5 +1,5 @@
 """Domain events -> notifications. The rest of the codebase calls these; wording lives in one place."""
-from .models import Kind
+from .models import Channel, Kind
 from .services import notify
 
 
@@ -34,7 +34,8 @@ def contribution_received(contribution):
         else:
             notify(user, Kind.CONTRIBUTION, f"{payer.display_name} contributed",
                    f"{payer.display_name} paid {naira(contribution.amount)} toward {group.name}.",
-                   group=group, dedupe_key=f"contrib:{contribution.pk}:{user.pk}")
+                   group=group, dedupe_key=f"contrib:{contribution.pk}:{user.pk}",
+                   channels=(Channel.IN_APP,))  # other members' payments stay in the app; no email for each one
 
 
 def group_funded(group):

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Payment · SplitPay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="card card-pad mx-auto mt-8 max-w-lg text-center">
+    {% if contribution.status == "paid" %}
+      <h1 class="section-title">Payment received</h1>
+      <p class="mt-2 text-body text-muted">Thank you. Your share has been recorded.</p>
+    {% elif contribution.status == "failed" %}
+      <h1 class="section-title">That payment didn't go through</h1>
+      <p class="mt-2 text-body text-muted">You can try again from the group in the app.</p>
+    {% else %}
+      <h1 class="section-title">Checking your payment</h1>
+      <p class="mt-2 text-body text-muted">It will show in the app as soon as it's confirmed.</p>
+    {% endif %}
+    <a href="splitpay://payment" class="btn-primary btn-block mt-5">Back to the app</a>
+  </div>
+</div>
+{% endblock %}

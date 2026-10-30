@@ -7,6 +7,7 @@ from rest_framework import serializers
 from apps.accounts.serializers import UserSummarySerializer
 from apps.billpay import catalog
 from apps.contributions.selectors import progress
+from apps.payouts.fees import fee_for_payment
 
 from .models import ContributionGroup, GroupMembership, PayoutType
 from .services import find_user
@@ -29,6 +30,8 @@ class GroupSerializer(serializers.ModelSerializer):
     my_membership = serializers.SerializerMethodField()
     recipient_account = serializers.CharField(source="masked_recipient_account", read_only=True)
     biller_name = serializers.SerializerMethodField()
+    pay_quote = serializers.SerializerMethodField()
+    needs_review = serializers.SerializerMethodField()
 
     class Meta:
         model = ContributionGroup
@@ -36,8 +39,9 @@ class GroupSerializer(serializers.ModelSerializer):
             "id", "name", "description", "purpose", "target_amount", "due_date", "is_recurring",
             "recurrence_interval", "status", "admin", "payout_type", "allow_partial_payout",
             "bill_service_id", "biller_name", "bill_customer_id", "bill_variation",
-            "recipient_bank_name", "recipient_account_name", "recipient_account",
+            "recipient_bank_code", "recipient_bank_name", "recipient_account_name", "recipient_account",
             "cycle_number", "previous_cycle", "funded_at", "created_at", "progress", "my_membership",
+            "pay_quote", "needs_review",
         )
         read_only_fields = fields
 
@@ -56,6 +60,25 @@ class GroupSerializer(serializers.ModelSerializer):
             return None
         membership = obj.memberships.filter(user=request.user).exclude(status="left").first()
         return MembershipSerializer(membership).data if membership else None
+
+    @extend_schema_field(inline_serializer("PayQuote", {
+        "share": serializers.DecimalField(14, 2), "fee": serializers.DecimalField(14, 2),
+        "total": serializers.DecimalField(14, 2),
+    }, allow_null=True))
+    def get_pay_quote(self, obj):
+        """What paying the requester's outstanding share would charge right now, shown before they commit."""
+        request = self.context.get("request")
+        membership = obj.memberships.filter(user=request.user, status="joined").first() if request else None
+        if not membership or not obj.is_open_for_contributions or membership.outstanding <= 0:
+            return None
+        fee = fee_for_payment(membership.outstanding).amount
+        return {"share": membership.outstanding, "fee": fee, "total": membership.outstanding + fee}
+
+    def get_needs_review(self, obj) -> bool:
+        request = self.context.get("request")
+        if not request or obj.admin_id != request.user.pk:
+            return False
+        return obj.contributions.filter(needs_review=True).exists()
 
     def get_biller_name(self, obj) -> str:
         biller = catalog.get_biller(obj.bill_service_id)

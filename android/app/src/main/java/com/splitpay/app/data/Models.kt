@@ -2,6 +2,7 @@ package com.splitpay.app.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 // Money stays a String (the API sends decimals as strings) so nothing is rounded through a Double.
 
@@ -89,35 +90,27 @@ data class Group(
     val admin: UserSummary,
     @SerialName("payout_type") val payoutType: String,
     @SerialName("allow_partial_payout") val allowPartialPayout: Boolean = false,
+    @SerialName("recurrence_interval") val recurrenceInterval: String? = null,
+    @SerialName("cycle_number") val cycleNumber: Int = 1,
+    @SerialName("bill_service_id") val billServiceId: String = "",
+    @SerialName("bill_customer_id") val billCustomerId: String = "",
+    @SerialName("bill_variation") val billVariation: String = "",
+    @SerialName("recipient_bank_code") val recipientBankCode: String = "",
     @SerialName("recipient_bank_name") val recipientBankName: String = "",
     @SerialName("recipient_account_name") val recipientAccountName: String = "",
     @SerialName("recipient_account") val recipientAccount: String = "",
     @SerialName("biller_name") val billerName: String = "",
     val progress: Progress,
     @SerialName("my_membership") val myMembership: Membership? = null,
+    @SerialName("pay_quote") val payQuote: PayQuote? = null,
+    @SerialName("needs_review") val needsReview: Boolean = false,
 )
+
+@Serializable
+data class PayQuote(val share: String, val fee: String, val total: String)
 
 @Serializable
 data class Page<T>(val count: Int = 0, val next: String? = null, val results: List<T> = emptyList())
-
-@Serializable
-data class MemberInput(val identifier: String)
-
-@Serializable
-data class GroupInput(
-    val name: String,
-    val description: String,
-    val purpose: String,
-    @SerialName("target_amount") val targetAmount: String,
-    @SerialName("due_date") val dueDate: String,
-    @SerialName("payout_type") val payoutType: String = "bank_transfer",
-    @SerialName("allow_partial_payout") val allowPartialPayout: Boolean,
-    @SerialName("recipient_bank_code") val recipientBankCode: String,
-    @SerialName("recipient_bank_name") val recipientBankName: String,
-    @SerialName("recipient_account_name") val recipientAccountName: String,
-    @SerialName("recipient_account_number") val recipientAccountNumber: String,
-    val members: List<MemberInput>,
-)
 
 @Serializable
 class ContributeRequest
@@ -130,6 +123,8 @@ data class Contribution(
     @SerialName("charge_amount") val chargeAmount: String,
     val status: String,
     val reference: String,
+    val member: UserSummary? = null,
+    @SerialName("paid_at") val paidAt: String? = null,
 )
 
 @Serializable
@@ -146,6 +141,8 @@ data class LedgerEntry(
     val amount: String? = null,
     val status: String = "",
     val actor: String = "",
+    val reference: String = "",
+    val detail: JsonObject = JsonObject(emptyMap()),
 )
 
 @Serializable
@@ -162,6 +159,66 @@ data class MemberStanding(
 data class Ledger(
     val results: List<LedgerEntry> = emptyList(),
     val members: List<MemberStanding> = emptyList(),
+    val summary: LedgerSummary? = null,
+)
+
+@Serializable
+data class LedgerSummary(
+    val funded: String,
+    val remaining: String,
+    val fee: String? = null,
+    val net: String? = null,
+)
+
+@Serializable
+data class FeeLine(
+    val description: String,
+    @SerialName("fee_type") val feeType: String = "",
+    val rate: String = "",
+    val amount: String,
+)
+
+/** A bank payout or a bill payment; the fields that don't apply stay at their defaults. */
+@Serializable
+data class PayoutRecord(
+    val status: String,
+    val reference: String,
+    @SerialName("gross_amount") val grossAmount: String,
+    @SerialName("net_amount") val netAmount: String,
+    val fees: List<FeeLine> = emptyList(),
+    @SerialName("is_partial") val isPartial: Boolean = false,
+    @SerialName("failure_reason") val failureReason: String = "",
+    @SerialName("completed_at") val completedAt: String? = null,
+    @SerialName("recipient_bank_name") val recipientBankName: String = "",
+    @SerialName("recipient_account_name") val recipientAccountName: String = "",
+    @SerialName("recipient_account") val recipientAccount: String = "",
+    val biller: String = "",
+    @SerialName("customer_id") val customerId: String = "",
+    val variation: String = "",
+    val token: String = "",
+    val units: String = "",
+    @SerialName("customer_name") val customerName: String = "",
+    @SerialName("provider_reference") val providerReference: String = "",
+)
+
+@Serializable
+data class Biller(
+    @SerialName("service_id") val serviceId: String,
+    val name: String,
+    val category: String,
+    val variations: List<String> = emptyList(),
+    @SerialName("customer_label") val customerLabel: String = "Customer number",
+)
+
+@Serializable
+data class BillStatus(val enabled: Boolean)
+
+@Serializable
+data class MeterCheck(
+    val valid: Boolean,
+    val name: String = "",
+    val address: String = "",
+    val message: String = "",
 )
 
 @Serializable

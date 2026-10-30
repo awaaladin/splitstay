@@ -134,7 +134,7 @@ GOOGLE_VERIFICATION_FILE = "google5b749b03a7f03d37.html"
 # Crawlers stay out of signed-in and machine-only paths; everything else public is fair game.
 ROBOTS_DISALLOW = ("/admin/", "/api/", "/dashboard/", "/groups/", "/settings/", "/notifications/", "/pay/",
                    "/contributions/", "/billers/")
-SITEMAP_PAGES = ("web:landing", "web:guide", "web:pricing", "web:about", "web:contact", "web:privacy", "web:terms")
+SITEMAP_PAGES = ("web:landing", "web:app_download", "web:guide", "web:pricing", "web:about", "web:contact", "web:privacy", "web:terms")
 
 
 def _site_url() -> str:
@@ -166,6 +166,10 @@ def landing(request):
     if request.user.is_authenticated:
         return redirect("web:dashboard")
     return render(request, "landing.html", {"fee": _fee_policy(), "fee_examples": _fee_examples()})
+
+
+def app_download(request):
+    return render(request, "pages/app.html", {"download_url": settings.ANDROID_APK_URL})
 
 
 def guide(request):
@@ -567,10 +571,16 @@ def group_pay(request, pk):
     return redirect(url)
 
 
-@login_required
 def payment_return(request):
-    """Where the gateway sends the customer back. We verify with the gateway instead of trusting the URL."""
+    """Where the gateway sends the customer back. We verify with the gateway instead of trusting the URL.
+
+    The Android app's checkout browser has no website session, so visitors get a page leading back to the app.
+    """
     reference = request.GET.get("reference") or request.GET.get("trxref") or ""
+    if not request.user.is_authenticated:
+        contribution = get_object_or_404(Contribution, reference=reference)
+        contribution = payment_services.verify_and_confirm(contribution)
+        return render(request, "payments/return_to_app.html", {"contribution": contribution})
     contribution = get_object_or_404(Contribution, reference=reference, member=request.user)
     payment_services.verify_and_confirm(contribution)
     return redirect("web:contribution_confirmation", reference=reference)

@@ -7,11 +7,26 @@ def _deliver_in_app(notification: Notification) -> None:
     """In-app delivery is the row itself; it is 'sent' the moment it exists."""
 
 
-# Register push/SMS/email senders here; each receives the Notification and raises on failure.
-CHANNEL_HANDLERS = {Channel.IN_APP: _deliver_in_app}
+def _deliver_email(notification: Notification) -> None:
+    """Email the same words as the in-app notification. Sent after the surrounding transaction commits and
+    never raises (see mailer.py), so a mail outage cannot break a payment flow."""
+    from . import mailer
+
+    user = notification.user
+    link = f"/groups/{notification.group_id}/" if notification.group_id else "/notifications/"
+    mailer.send_after_commit(
+        user.email,
+        notification.title,
+        "notice",
+        {"name": mailer.display_name(user), "headline": notification.title, "body": notification.body, "link": link},
+    )
 
 
-def notify(user, kind, title, body="", *, group=None, data=None, dedupe_key=None, channels=(Channel.IN_APP,)):
+# Register push/SMS senders here; each receives the Notification and raises on failure.
+CHANNEL_HANDLERS = {Channel.IN_APP: _deliver_in_app, Channel.EMAIL: _deliver_email}
+
+
+def notify(user, kind, title, body="", *, group=None, data=None, dedupe_key=None, channels=(Channel.IN_APP, Channel.EMAIL)):
     """Create a notification (once per dedupe_key) and hand it to each channel."""
     if dedupe_key:
         existing = Notification.objects.filter(dedupe_key=dedupe_key).first()

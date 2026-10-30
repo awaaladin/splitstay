@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ brand }}{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f7fa;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{% block preheader %}{% endblock %}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+  <tr><td style="padding:0 4px 16px 4px;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:bold;color:#0b192c;">{{ brand }}</td></tr>
+  <tr><td style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 26px;font-family:Arial,Helvetica,sans-serif;color:#0b192c;font-size:15px;line-height:1.55;">
+    {% block content %}{% endblock %}
+  </td></tr>
+  <tr><td style="padding:16px 8px 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#64748b;text-align:center;">
+    {{ brand }}: pool money with the people you share costs with.<br>
+    Questions? Write to {{ support_email }}.<br>
+    &copy; {{ year }} {{ brand }}
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

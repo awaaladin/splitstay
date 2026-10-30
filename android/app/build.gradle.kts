@@ -15,6 +15,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
+        buildConfigField("String", "SITE_URL", "\"https://splitpay-swart.vercel.app\"")
         buildConfigField("String", "API_BASE_URL", "\"https://splitpay-swart.vercel.app/api/v1/\"")
     }
 

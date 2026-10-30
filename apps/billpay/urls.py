@@ -8,5 +8,6 @@ router.register("payments", views.BillPaymentViewSet, basename="bill-payment")
 
 urlpatterns = [
     path("billers/", views.BillerListView.as_view(), name="billers"),
+    path("status/", views.BillStatusView.as_view(), name="status"),
     path("validate/", views.ValidateMeterView.as_view(), name="validate-meter"),
 ] + router.urls
