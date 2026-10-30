@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -45,6 +46,7 @@ fun AuthScreen(api: SplitPayApi, session: Session) {
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
         Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
@@ -107,5 +109,9 @@ fun AuthScreen(api: SplitPayApi, session: Session) {
         TextButton(onClick = { registering = !registering; error = null }) {
             Text(if (registering) "I already have an account" else "New here? Create an account")
         }
+        if (!registering) {
+            TextButton(onClick = { openPage(context, "/password-reset/") }) { Text("Forgot your password?") }
+        }
+        TextButton(onClick = { openPage(context, "/guide/") }) { Text("How SplitPay works") }
     }
 }
