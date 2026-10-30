@@ -130,6 +130,38 @@ def _fee_examples() -> dict:
     return examples
 
 
+GOOGLE_VERIFICATION_FILE = "google5b749b03a7f03d37.html"
+# Crawlers stay out of signed-in and machine-only paths; everything else public is fair game.
+ROBOTS_DISALLOW = ("/admin/", "/api/", "/dashboard/", "/groups/", "/settings/", "/notifications/", "/pay/",
+                   "/contributions/", "/billers/")
+SITEMAP_PAGES = ("web:landing", "web:guide", "web:pricing", "web:about", "web:contact", "web:privacy", "web:terms")
+
+
+def _site_url() -> str:
+    return settings.SITE_URL.rstrip("/")
+
+
+@require_GET
+def robots_txt(request):
+    lines = ["User-agent: *", *(f"Disallow: {path}" for path in ROBOTS_DISALLOW), "",
+             f"Sitemap: {_site_url()}{reverse('web:sitemap')}", ""]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+@require_GET
+def sitemap_xml(request):
+    urls = "".join(f"<url><loc>{_site_url()}{reverse(name)}</loc></url>" for name in SITEMAP_PAGES)
+    body = ('<?xml version="1.0" encoding="UTF-8"?>'
+            f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>')
+    return HttpResponse(body, content_type="application/xml")
+
+
+@require_GET
+def google_verification(request):
+    """Search Console ownership proof. Google rechecks it, so this route must stay."""
+    return HttpResponse(f"google-site-verification: {GOOGLE_VERIFICATION_FILE}", content_type="text/html")
+
+
 def landing(request):
     if request.user.is_authenticated:
         return redirect("web:dashboard")

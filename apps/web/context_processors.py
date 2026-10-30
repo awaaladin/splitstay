@@ -1,4 +1,11 @@
+from django.conf import settings
+
 from apps.notifications.models import Notification
+
+
+def seo(request):
+    """The public origin, so canonical and social URLs are the same on every host alias."""
+    return {"site_url": settings.SITE_URL.rstrip("/")}
 
 
 def shell(request):

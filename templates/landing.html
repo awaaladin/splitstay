@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static cp %}
-{% block title %}SplitPay · Nobody chases anybody for money{% endblock %}
-{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}.stage-layer{position:static;opacity:1;transform:none;filter:none;margin-bottom:1rem}</style></noscript>{% endblock %}
+{% block title %}SplitPay · Split rent and bills in Nigeria{% endblock %}
+{% block og_title %}SplitPay · Split rent and bills in Nigeria{% endblock %}
+{% block description %}SplitPay lets housemates, families and friends in Nigeria pool money for rent, electricity and shared bills. Everyone pays their share, and the money goes out when the target is met.{% endblock %}
+{% block head %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"SplitPay","url":"{{ site_url }}/"}</script><noscript><style>.reveal{opacity:1;transform:none;filter:none}.stage-layer{position:static;opacity:1;transform:none;filter:none;margin-bottom:1rem}</style></noscript>{% endblock %}
 {% block main_class %}{% endblock %}
 
 {% block content %}

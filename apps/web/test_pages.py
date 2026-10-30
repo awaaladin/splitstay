@@ -8,6 +8,32 @@ from apps.testing import make_user
 PUBLIC = ("web:landing", "web:guide", "web:about", "web:pricing", "web:contact", "web:privacy", "web:terms")
 
 
+class SearchEngineTests(TestCase):
+    def test_google_verification_file_is_served_exactly(self):
+        res = self.client.get("/google5b749b03a7f03d37.html")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.content.decode(), "google-site-verification: google5b749b03a7f03d37.html")
+
+    @override_settings(SITE_URL="https://example.test/")
+    def test_robots_points_at_the_sitemap_and_hides_private_pages(self):
+        body = self.client.get("/robots.txt").content.decode()
+        self.assertIn("Sitemap: https://example.test/sitemap.xml", body)
+        self.assertIn("Disallow: /dashboard/", body)
+        self.assertNotIn("Disallow: /guide/", body)
+
+    @override_settings(SITE_URL="https://example.test/")
+    def test_sitemap_lists_public_pages_only(self):
+        body = self.client.get("/sitemap.xml").content.decode()
+        self.assertIn("<loc>https://example.test/</loc>", body)
+        self.assertIn("<loc>https://example.test/fees/</loc>", body)
+        self.assertNotIn("dashboard", body)
+
+    @override_settings(SITE_URL="https://example.test/")
+    def test_pages_declare_their_canonical_url(self):
+        html = self.client.get(reverse("web:pricing")).content.decode()
+        self.assertIn('<link rel="canonical" href="https://example.test/fees/">', html)
+
+
 class PublicPagesTests(TestCase):
     def test_every_public_page_renders_for_visitors(self):
         for name in PUBLIC:
