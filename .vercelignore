@@ -8,3 +8,5 @@ staticfiles
 .git
 Dockerfile
 docker-compose.yml
+android
+apk-output

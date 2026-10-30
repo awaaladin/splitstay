@@ -11,3 +11,12 @@ db.sqlite3
 !.env.example
 .vercel
 .env*
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.jks
+*.keystore
+apk-output/
