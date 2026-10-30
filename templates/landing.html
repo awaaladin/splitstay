@@ -26,6 +26,7 @@
         <a href="{% url 'web:guide' %}" class="btn-secondary !px-5 !py-3">Read the guide</a>
         {% else %}
         <a href="{% url 'web:register' %}" class="btn-primary magnetic !px-6 !py-3" data-magnetic>Start a group {% icon "arrow-right" 18 %}</a>
+        <a href="{% url 'web:app_download' %}" class="btn-secondary !px-6 !py-3">Get the Android app</a>
         <a href="{% url 'web:guide' %}" class="btn-secondary !px-5 !py-3">How to use it</a>
         {% endif %}
       </div>
