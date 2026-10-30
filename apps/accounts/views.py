@@ -6,6 +6,9 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from . import password_reset
 from .models import BankAccount
 from .serializers import (
     BankAccountSerializer,
@@ -70,3 +73,22 @@ class BankAccountView(generics.GenericAPIView):
     def delete(self, request):
         BankAccount.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PasswordResetRequestView(ThrottledAuthMixin, APIView):
+    """Always answers 200, so nobody can use it to find out which emails have accounts."""
+
+    def post(self, request):
+        password_reset.request_reset(request.data.get("email", ""))
+        return Response({"detail": "If that email has an account, we sent a link to reset the password."})
+
+
+class PasswordResetConfirmView(ThrottledAuthMixin, APIView):
+    def post(self, request):
+        try:
+            password_reset.confirm_reset(
+                request.data.get("uid", ""), request.data.get("token", ""), request.data.get("password", "")
+            )
+        except DjangoValidationError as exc:
+            return Response({"detail": " ".join(exc.messages)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Password changed. You can sign in now."})

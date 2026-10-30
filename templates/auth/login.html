@@ -13,6 +13,7 @@
       {% include "partials/field.html" with field=form.identifier %}
       {% include "partials/field.html" with field=form.password %}
       <button type="submit" class="btn-primary btn-block">Sign in</button>
+      <p class="text-center text-body"><a class="text-muted hover:underline" href="{% url 'web:forgot_password' %}">Forgot your password?</a></p>
     </form>
     <p class="mt-5 text-center text-body text-muted">New here? <a class="font-medium text-primary hover:underline" href="{% url 'web:register' %}">Create an account</a></p>
   </div>

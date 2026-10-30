@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Choose a new password · SplitPay{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="mx-auto max-w-md pt-4 sm:pt-10">
+    {% if invalid %}
+      <h1 class="page-title">This link has expired</h1>
+      <p class="mt-3 text-body text-muted">The reset link is wrong, already used, or too old. Ask for a new one.</p>
+      <p class="mt-5 text-body"><a class="font-medium text-primary hover:underline" href="{% url 'web:forgot_password' %}">Send me a new link</a></p>
+    {% else %}
+      <h1 class="page-title">Choose a new password</h1>
+      <form method="post" class="card card-pad mt-6 space-y-5" data-busy novalidate>
+        {% csrf_token %}
+        {% include "partials/field.html" with field=form.password %}
+        {% include "partials/field.html" with field=form.confirm %}
+        <button type="submit" class="btn-primary btn-block">Save new password</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

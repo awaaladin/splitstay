@@ -35,5 +35,5 @@ class ReminderTests(TestCase):
         group = make_group(target="90000", members=1)
         pay(group, group.admin)
         for n in Notification.objects.all():
-            self.assertEqual(n.deliveries.get().channel, "in_app")
-            self.assertEqual(n.deliveries.get().status, NotificationDelivery.Status.SENT)
+            in_app = n.deliveries.get(channel="in_app")
+            self.assertEqual(in_app.status, NotificationDelivery.Status.SENT)
