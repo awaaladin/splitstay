@@ -2,10 +2,15 @@ from django.conf import settings
 
 from apps.notifications.models import Notification
 
+APP_USER_AGENT = "SplitPayAndroid"  # added by the Android app's WebView
+
 
 def seo(request):
     """The public origin, so canonical and social URLs are the same on every host alias."""
-    return {"site_url": settings.SITE_URL.rstrip("/")}
+    return {
+        "site_url": settings.SITE_URL.rstrip("/"),
+        "in_app": APP_USER_AGENT in request.headers.get("User-Agent", ""),
+    }
 
 
 def shell(request):

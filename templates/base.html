@@ -83,7 +83,7 @@
       {% endif %}
 
       <div class="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1.5">
-        <a href="{% url 'web:app_download' %}" class="btn-secondary btn-sm hidden sm:inline-flex">{% icon "download" 16 %} Get the app</a>
+        {% if not in_app %}<a href="{% url 'web:app_download' %}" class="btn-secondary btn-sm hidden sm:inline-flex">{% icon "download" 16 %} Get the app</a>{% endif %}
         {# Theme toggle: persists to localStorage, follows the system on first visit #}
         <button type="button" class="btn-quiet !p-2" x-data="themeToggle()" @click="toggle()" :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'" :aria-pressed="dark">
           <span x-show="!dark">{% icon "moon" 20 %}</span>
@@ -132,7 +132,7 @@
     <nav class="border-t border-line md:hidden" x-show="mobile" x-cloak x-transition.opacity.duration.120ms aria-label="Mobile">
       <div class="page flex flex-col gap-1 py-2">
         <a class="nav-link" href="{% url 'web:dashboard' %}">Dashboard</a>
-        <a class="nav-link" href="{% url 'web:app_download' %}">Get the app</a>
+        {% if not in_app %}<a class="nav-link" href="{% url 'web:app_download' %}">Get the app</a>{% endif %}
         <a class="nav-link" href="{% url 'web:notifications' %}">Activity</a>
         <a class="nav-link" href="{% url 'web:settings' %}">Settings</a>
         <a class="nav-link" href="{% url 'web:guide' %}">Guide</a>
@@ -141,7 +141,7 @@
     </nav>
     {% endif %}
     {# Phones have no room for the header button, so they get a strip that can be dismissed for good. #}
-    {% if request.resolver_match.url_name != 'app_download' %}
+    {% if request.resolver_match.url_name != 'app_download' and not in_app %}
     <div class="border-t border-line bg-primary-soft sm:hidden" x-data="{ hidden: false }"
          x-init="try { hidden = !!localStorage.getItem('cp-app-strip-hidden') } catch (e) {}" x-show="!hidden">
       <div class="page flex items-center justify-between gap-3 py-2">
@@ -176,6 +176,7 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if not in_app %}
   <footer class="border-t border-line py-12 no-print">
     <div class="page grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
       <div class="lg:col-span-3">
@@ -211,6 +212,7 @@
       <p class="flex items-center gap-2">{% icon "shield-check" 16 %} Every naira is recorded in the group ledger.</p>
     </div>
   </footer>
+  {% endif %}
 
   {# Global confirmation dialog. Any button can open it: @click="$dispatch('confirm', {...})" #}
   <div x-data="{ open: false, d: {} }" @confirm.window="d = $event.detail; open = true" @keydown.escape.window="open = false">

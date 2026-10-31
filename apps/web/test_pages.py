@@ -47,6 +47,12 @@ class AndroidAppPageTests(TestCase):
         self.assertIn("Get the app", html)
         self.assertIn("cp-app-strip-hidden", html)
 
+    def test_the_android_app_does_not_advertise_itself_or_show_the_footer(self):
+        html = self.client.get(reverse("web:about"), headers={"User-Agent": "Mozilla/5.0 SplitPayAndroid/1"}).content.decode()
+        self.assertNotIn("Get the app", html)
+        self.assertNotIn("cp-app-strip-hidden", html)
+        self.assertNotIn("<footer", html)
+
     def test_the_download_page_does_not_advertise_itself(self):
         self.assertNotContains(self.client.get(reverse("web:app_download")), "cp-app-strip-hidden")
 

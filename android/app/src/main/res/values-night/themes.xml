@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- A dark theme tells the website the phone prefers dark mode, as a browser would. -->
+    <style name="Theme.SplitPay" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/navy</item>
+    </style>
+</resources>

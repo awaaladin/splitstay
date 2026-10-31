@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="offline_title">You\'re offline</string>
+    <string name="offline_body">Check your connection and try again. Your groups and payments are safe.</string>
+    <string name="retry">Try again</string>
+</resources>
