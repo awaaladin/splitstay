@@ -83,6 +83,7 @@
       {% endif %}
 
       <div class="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-1.5">
+        <a href="{% url 'web:app_download' %}" class="btn-secondary btn-sm hidden sm:inline-flex">{% icon "download" 16 %} Get the app</a>
         {# Theme toggle: persists to localStorage, follows the system on first visit #}
         <button type="button" class="btn-quiet !p-2" x-data="themeToggle()" @click="toggle()" :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'" :aria-pressed="dark">
           <span x-show="!dark">{% icon "moon" 20 %}</span>
@@ -131,12 +132,27 @@
     <nav class="border-t border-line md:hidden" x-show="mobile" x-cloak x-transition.opacity.duration.120ms aria-label="Mobile">
       <div class="page flex flex-col gap-1 py-2">
         <a class="nav-link" href="{% url 'web:dashboard' %}">Dashboard</a>
+        <a class="nav-link" href="{% url 'web:app_download' %}">Get the app</a>
         <a class="nav-link" href="{% url 'web:notifications' %}">Activity</a>
         <a class="nav-link" href="{% url 'web:settings' %}">Settings</a>
         <a class="nav-link" href="{% url 'web:guide' %}">Guide</a>
         <a class="nav-link" href="{% url 'web:contact' %}">Contact</a>
       </div>
     </nav>
+    {% endif %}
+    {# Phones have no room for the header button, so they get a strip that can be dismissed for good. #}
+    {% if request.resolver_match.url_name != 'app_download' %}
+    <div class="border-t border-line bg-primary-soft sm:hidden" x-data="{ hidden: false }"
+         x-init="try { hidden = !!localStorage.getItem('cp-app-strip-hidden') } catch (e) {}" x-show="!hidden">
+      <div class="page flex items-center justify-between gap-3 py-2">
+        <p class="text-meta text-fg">SplitPay for Android</p>
+        <div class="flex items-center gap-1">
+          <a href="{% url 'web:app_download' %}" class="btn-primary btn-sm">{% icon "download" 16 %} Download</a>
+          <button type="button" class="btn-quiet !p-1.5" aria-label="Dismiss"
+                  @click="hidden = true; try { localStorage.setItem('cp-app-strip-hidden', '1') } catch (e) {}">{% icon "x" 16 %}</button>
+        </div>
+      </div>
+    </div>
     {% endif %}
   </header>
 

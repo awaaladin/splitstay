@@ -9,6 +9,7 @@ register = template.Library()
 
 # Lucide outline icons, 24x24 viewBox. Rendered with a uniform 1.5 stroke.
 ICONS = {
+    "download": '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
     "check": '<path d="M20 6 9 17l-5-5"/>',
     "plus": '<path d="M5 12h14"/><path d="M12 5v14"/>',
     "x": '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',

@@ -42,6 +42,14 @@ class AndroidAppPageTests(TestCase):
         self.assertIn('href="https://example.test/SplitPay.apk"', html)
         self.assertIn("Install unknown apps", html)
 
+    def test_every_page_offers_the_app_in_the_header_and_on_phones(self):
+        html = self.client.get(reverse("web:about")).content.decode()
+        self.assertIn("Get the app", html)
+        self.assertIn("cp-app-strip-hidden", html)
+
+    def test_the_download_page_does_not_advertise_itself(self):
+        self.assertNotContains(self.client.get(reverse("web:app_download")), "cp-app-strip-hidden")
+
     def test_footer_links_to_the_app_page(self):
         html = self.client.get(reverse("web:about")).content.decode()
         self.assertIn(f'href="{reverse("web:app_download")}"', html)
