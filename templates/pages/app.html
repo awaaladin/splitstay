@@ -3,60 +3,73 @@
 {% block title %}Download the SplitPay Android app{% endblock %}
 {% block og_title %}Download the SplitPay Android app{% endblock %}
 {% block description %}Get the SplitPay app for Android phones. Same account, same groups and same payments as the website, with simple steps if your phone blocks the download.{% endblock %}
+{% block head %}<noscript><style>.reveal{opacity:1;transform:none;filter:none}</style></noscript>{% endblock %}
+{% block main_class %}{% endblock %}
 {% block content %}
-<div class="page">
-  <div class="mx-auto max-w-2xl">
-    <p class="eyebrow">Android app</p>
-    <h1 class="page-title mt-1">SplitPay on your phone</h1>
-    <p class="mt-4 text-lead text-muted">The same account, groups and payments as the website. Sign in with the details you already use.</p>
-
-    <a href="{{ download_url }}" class="btn-primary btn-block mt-6">{% icon "download" 18 %} Download for Android</a>
-    <p class="hint">Needs Android 8 or newer. iPhone isn't supported yet, so please use the website.</p>
-
-    <h2 class="section-title mt-10">How to install it</h2>
-    <ol class="mt-3 list-decimal space-y-2 pl-5 text-body text-muted">
-      <li>Open this page in Chrome on your Android phone and tap <strong class="text-fg">Download for Android</strong>.</li>
-      <li>When the download finishes, tap <strong class="text-fg">Open</strong>. You can also find <strong class="text-fg">SplitPay.apk</strong> in the Files app, under Downloads.</li>
-      <li>Tap <strong class="text-fg">Install</strong>, then open SplitPay and sign in.</li>
-    </ol>
-
-    <h2 class="section-title mt-10">If it doesn't download or install</h2>
-    <p class="mt-3 text-body text-muted">SplitPay isn't on the Play Store yet, so Android and Chrome ask you to confirm. Find the message you see below.</p>
-
-    <div class="card card-pad mt-4">
-      <h3 class="text-body font-semibold text-fg">Chrome says the file might be harmful</h3>
-      <p class="mt-2 text-body text-muted">Chrome shows this for apps from outside the Play Store. Tap <strong class="text-fg">Download anyway</strong>.</p>
-      <p class="mt-2 text-body text-muted">If you don't see that option, open Chrome's menu (the three dots), tap <strong class="text-fg">Downloads</strong>, and look for SplitPay.apk there.</p>
+<section class="force-dark relative overflow-hidden border-b border-line">
+  <div class="hero-bg"></div>
+  <div class="page relative py-20 sm:py-28">
+    <p class="reveal eyebrow">Android app</p>
+    <h1 class="reveal mt-4 max-w-3xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-fg sm:text-6xl" style="--d:100ms">SplitPay, right on your phone.</h1>
+    <p class="reveal mt-6 max-w-2xl text-lead text-muted" style="--d:200ms">Everything the website does, in an app you open with one tap. Sign in with the account you already have. Your groups, payments and receipts are all there.</p>
+    <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="--d:300ms">
+      <a href="{{ download_url }}" class="btn-primary !px-6 !py-3">{% icon "download" 18 %} Download for Android</a>
+      <a href="#install" class="btn-secondary !px-5 !py-3">How to install it</a>
     </div>
-
-    <div class="card card-pad mt-4">
-      <h3 class="text-body font-semibold text-fg">Your phone says it can't install apps from this source</h3>
-      <ol class="mt-2 list-decimal space-y-2 pl-5 text-body text-muted">
-        <li>Open your phone's <strong class="text-fg">Settings</strong>, then <strong class="text-fg">Apps</strong>.</li>
-        <li>Tap <strong class="text-fg">Chrome</strong>. If you can't see it, tap <strong class="text-fg">See all apps</strong> first.</li>
-        <li>Tap <strong class="text-fg">Install unknown apps</strong> and turn on <strong class="text-fg">Allow from this source</strong>.</li>
-        <li>Go back to your downloads and tap SplitPay.apk again.</li>
-      </ol>
-      <p class="mt-2 text-meta text-muted">The wording changes a little between phone brands. If you can't find it, search for "unknown apps" in Settings. You can turn it off again after installing.</p>
-    </div>
-
-    <div class="card card-pad mt-4">
-      <h3 class="text-body font-semibold text-fg">Google Play Protect shows a warning</h3>
-      <p class="mt-2 text-body text-muted">Tap <strong class="text-fg">More details</strong>, then <strong class="text-fg">Install anyway</strong>.</p>
-    </div>
-
-    <div class="card card-pad mt-4">
-      <h3 class="text-body font-semibold text-fg">The download doesn't start</h3>
-      <p class="mt-2 text-body text-muted">Check that you have about 30 MB of free space and a working connection, then try again. If it still won't start, open Chrome's menu, tap the settings item, then <strong class="text-fg">Site settings</strong>, then <strong class="text-fg">Automatic downloads</strong>, and allow it.</p>
-    </div>
-
-    <div class="card card-pad mt-4">
-      <h3 class="text-body font-semibold text-fg">It says the app wasn't installed when updating</h3>
-      <p class="mt-2 text-body text-muted">Uninstall the old SplitPay app, then install the new one. Your groups and payments are safe because they're stored in your account. You'll just need to sign in again.</p>
-    </div>
-
-    <p class="alert-warn mt-6 text-meta">{% icon "alert" 18 "mt-0.5" %} <span>Only download SplitPay from this page. Never install a copy someone sends you on WhatsApp or elsewhere.</span></p>
-    <p class="mt-6 text-body text-muted">Still stuck? <a class="text-primary underline" href="{% url 'web:contact' %}">Contact us</a> and tell us what message you see.</p>
+    <p class="reveal mt-4 text-meta text-muted" style="--d:360ms">Free · Android 8 or newer · About 2 MB. On an iPhone? Use the website in Safari for now.</p>
   </div>
-</div>
+</section>
+
+<section id="install" class="scroll-mt-24 py-20 sm:py-28">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">Installing</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">Three taps and you're in.</h2></div>
+    <ol class="space-y-5 lg:col-span-8">
+      <li class="reveal flex gap-4" style="--d:120ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">1</span><div><p class="text-body font-medium">Tap Download for Android.</p><p class="meta mt-0.5">Open this page in Chrome on your Android phone. The file is called SplitPay.apk.</p></div></li>
+      <li class="reveal flex gap-4" style="--d:200ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">2</span><div><p class="text-body font-medium">Tap Open when it finishes.</p><p class="meta mt-0.5">Missed it? You'll find SplitPay.apk in your Files app, under Downloads.</p></div></li>
+      <li class="reveal flex gap-4" style="--d:280ms"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-primary-soft text-meta font-semibold text-primary">3</span><div><p class="text-body font-medium">Tap Install, then sign in.</p><p class="meta mt-0.5">If your phone asks you to confirm first, the questions below show exactly what to tap.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="border-y border-line py-20 sm:py-28">
+  <div class="page">
+    <p class="reveal eyebrow">Same SplitPay</p>
+    <div class="mt-8 grid gap-6 md:grid-cols-3">
+      <div class="spot reveal p-6" data-spot><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "user" 20 %}</span><h3 class="mt-4 text-section">One account</h3><p class="mt-2 text-body text-muted">Sign in with your email or phone number. Anything you do in the app shows on the website straight away, and the other way round.</p></div>
+      <div class="spot reveal p-6" data-spot style="--d:80ms"><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "wallet" 20 %}</span><h3 class="mt-4 text-section">Every feature</h3><p class="mt-2 text-body text-muted">Start groups, pay your share through Paystack, follow the ledger and open receipts. You can also copy electricity tokens and save receipts as PDF.</p></div>
+      <div class="spot reveal p-6" data-spot style="--d:160ms"><span class="grid h-10 w-10 place-items-center rounded-lg bg-primary-soft text-primary">{% icon "shield-check" 20 %}</span><h3 class="mt-4 text-section">Always up to date</h3><p class="mt-2 text-body text-muted">Changes to SplitPay reach the app as soon as they're live, so you rarely need to download it again.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-20 sm:py-28">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">If it doesn't install</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">Your phone is only being careful.</h2><p class="reveal mt-4 text-body text-muted" style="--d:120ms">SplitPay isn't on the Play Store yet, so Android and Chrome ask you to confirm. Find the message you see.</p></div>
+    <div class="reveal divide-line rounded-xl border border-line bg-surface lg:col-span-8" style="--d:160ms">
+      <details class="faq group p-5" open><summary>Chrome says the file might be harmful<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Chrome shows this for any app from outside the Play Store. Tap <b>Download anyway</b>. If you don't see it, open Chrome's menu (the three dots), tap <b>Downloads</b>, and look for SplitPay.apk.</p></details>
+      <details class="faq group p-5"><summary>It says it can't install apps from this source<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Open <b>Settings</b>, then <b>Apps</b>, then <b>Chrome</b> (tap <b>See all apps</b> if it isn't listed). Tap <b>Install unknown apps</b> and turn on <b>Allow from this source</b>. Go back and tap SplitPay.apk again. Wording differs a little between phone brands, so search Settings for "unknown apps" if you can't find it. You can turn it off after installing.</p></details>
+      <details class="faq group p-5"><summary>Google Play Protect shows a warning<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Tap <b>More details</b>, then <b>Install anyway</b>.</p></details>
+      <details class="faq group p-5"><summary>The download doesn't start<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Check your connection and that you have a little free space, then try again. If it still won't start, open Chrome's menu, then <b>Settings</b>, <b>Site settings</b> and <b>Automatic downloads</b>, and allow it.</p></details>
+      <details class="faq group p-5"><summary>It says the app wasn't installed when updating<span class="chev">{% icon "chevron-down" 18 %}</span></summary><p>Uninstall the old SplitPay app, then install the new one. Your groups and payments are stored in your account, so nothing is lost. You'll just sign in again.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="force-dark border-t border-line py-20">
+  <div class="page grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4"><p class="reveal eyebrow">Stay safe</p><h2 class="reveal mt-3 text-title text-fg" style="--d:80ms">Only from this page.</h2></div>
+    <ul class="reveal space-y-3 text-body text-muted lg:col-span-8" style="--d:120ms">
+      <li class="flex gap-3">{% icon "check" 18 "mt-1 flex-none text-ok" %}<span><b class="font-semibold text-fg">Download it here.</b> Never install a copy someone sends you on WhatsApp, Telegram or anywhere else.</span></li>
+      <li class="flex gap-3">{% icon "check" 18 "mt-1 flex-none text-ok" %}<span><b class="font-semibold text-fg">Payments go through Paystack.</b> SplitPay never asks for your card PIN or bank password in a message or call.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="page flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+    <h2 class="text-title text-fg">Still stuck?</h2>
+    <div class="flex gap-3"><a href="{% url 'web:guide' %}" class="btn-secondary">Read the guide</a><a href="{% url 'web:contact' %}" class="btn-primary">Contact us</a></div>
+  </div>
+</section>
 {% endblock %}
+{% block scripts %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock %}
